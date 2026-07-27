@@ -4,26 +4,15 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONFIG_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-superpowers_file="${CONFIG_ROOT}/skills/using-superpowers/SKILL.md"
-if [ -f "$superpowers_file" ]; then
-    using_superpowers_content=$(cat "$superpowers_file")
-else
-    using_superpowers_content="Error: using-superpowers skill file not found."
-fi
-
-atomic_commit_file="${CONFIG_ROOT}/skills/using-atomic-commit/SKILL.md"
-if [ -f "$atomic_commit_file" ]; then
-    using_atomic_commit_content=$(cat "$atomic_commit_file")
-else
-    using_atomic_commit_content="Error: using-atomic-commit skill file not found."
-fi
-
-caveman_file="${CONFIG_ROOT}/skills/caveman/SKILL.md"
-if [ -f "$caveman_file" ]; then
-    caveman_content=$(cat "$caveman_file")
-else
-    caveman_content="Error: caveman skill file not found."
-fi
+read_skill_file() {
+    local file="$1"
+    local name="$2"
+    if [ -f "$file" ]; then
+        cat "$file"
+    else
+        echo "Error: ${name} skill file not found."
+    fi
+}
 
 escape_for_json() {
     local s="$1"
@@ -34,6 +23,10 @@ escape_for_json() {
     s="${s//$'\t'/\\t}"
     printf '%s' "$s"
 }
+
+using_superpowers_content=$(read_skill_file "${CONFIG_ROOT}/skills/using-superpowers/SKILL.md" "using-superpowers")
+using_atomic_commit_content=$(read_skill_file "${CONFIG_ROOT}/skills/using-atomic-commit/SKILL.md" "using-atomic-commit")
+caveman_content=$(read_skill_file "${CONFIG_ROOT}/skills/caveman/SKILL.md" "caveman")
 
 using_superpowers_escaped=$(escape_for_json "$using_superpowers_content")
 using_atomic_commit_escaped=$(escape_for_json "$using_atomic_commit_content")

@@ -88,21 +88,15 @@ echo ""
 
 # 3. Skills (Local & Waza Upstream)
 echo -e "${BOLD}Skills${NC}"
-if [ -d "${SCRIPT_DIR}/skills" ]; then
-    for skill_path in "${SCRIPT_DIR}/skills/"*; do
-        if [ -d "${skill_path}" ]; then
-            make_symlink "${skill_path}" "${TARGET_DIR}/skills/$(basename "${skill_path}")"
-        fi
-    done
-fi
-
-if [ -d "${SCRIPT_DIR}/plugins/waza/skills" ]; then
-    for skill_path in "${SCRIPT_DIR}/plugins/waza/skills/"*; do
-        if [ -d "${skill_path}" ]; then
-            make_symlink "${skill_path}" "${TARGET_DIR}/skills/$(basename "${skill_path}")"
-        fi
-    done
-fi
+for skill_dir in "${SCRIPT_DIR}/skills" "${SCRIPT_DIR}/plugins/waza/skills"; do
+    if [ -d "${skill_dir}" ]; then
+        for skill_path in "${skill_dir}/"*; do
+            if [ -d "${skill_path}" ]; then
+                make_symlink "${skill_path}" "${TARGET_DIR}/skills/$(basename "${skill_path}")"
+            fi
+        done
+    fi
+done
 
 echo ""
 if [ "$DRY_RUN" = true ]; then
