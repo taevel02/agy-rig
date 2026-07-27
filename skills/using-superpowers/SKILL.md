@@ -19,16 +19,22 @@ This is not negotiable. You cannot rationalize your way out of this.
 
 **Invoke relevant or requested skills BEFORE any response or action** — including clarifying questions, exploring the codebase, or checking files. If it turns out wrong for the situation, you don't have to use it.
 
-**Before entering plan mode:** if you haven't already brainstormed, invoke the brainstorming skill first.
-
 Then announce "Using [skill] to [purpose]" and follow the skill exactly. If it has a checklist, create a todo per item.
 
-## Skill Priority
+## Available Skills & Mapping
 
-When multiple skills apply, process skills come first — they set the approach, then implementation skills (frontend-design, etc.) carry it out. Brainstorming and systematic-debugging are Superpowers' most common process skills, but the rule holds for any of them.
+Process skills set the approach; execution skills carry out specific tasks. Always invoke matching skills from your environment:
 
-- "Let's build X" → superpowers:brainstorming first, then implementation skills.
-- "Fix this bug" → superpowers:systematic-debugging first
+- **Plan / Architecture / Pre-build design**: `/waza:think`
+- **Code review / Release gates / Audit**: `/waza:check`
+- **Root cause diagnosis / Bug fix / Regression**: `/waza:hunt`
+- **UI/UX design / Visual polish / Styling**: `/waza:ui`
+- **Writing prose / Release notes / Copywriting**: `/waza:write`
+- **Research / Synthesis / Material compilation**: `/waza:learn`
+- **Fetching URLs / Reading PDFs**: `/waza:read`
+- **Engineering health audit / Config check**: `/waza:health`
+- **Code refactoring for clarity & simplicity**: `simplify`
+- **Terse token-saving response mode**: `caveman`
 
 ## Red Flags
 
