@@ -32,6 +32,16 @@ else
     echo -e "${CYAN}[SETUP] Installing Antigravity environment...${NC}\n"
 fi
 
+# Environment File Check (.env)
+if [ ! -f "${SCRIPT_DIR}/.env" ] && [ -f "${SCRIPT_DIR}/.env.example" ]; then
+    if [ "$DRY_RUN" = true ]; then
+        echo -e "${DIM}[INFO] Would create .env from .env.example${NC}\n"
+    else
+        cp "${SCRIPT_DIR}/.env.example" "${SCRIPT_DIR}/.env"
+        echo -e "${BLUE}[CONFIG] Created .env template from .env.example${NC}\n"
+    fi
+fi
+
 # Auto-update Waza plugin
 if [ -d "${SCRIPT_DIR}/plugins/waza/.git" ]; then
     if [ "$DRY_RUN" = true ]; then
