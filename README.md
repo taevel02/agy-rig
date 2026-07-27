@@ -6,7 +6,7 @@
 
 ## Key Features
 
-- **Automated Symlink Setup (`install.sh`)**: One-command installation linking configs to `~/.gemini/config/` with full `--dry-run` preview support.
+- **Automated Symlink Setup (`install.sh`)**: One-command installation linking configs & individual skills to `~/.gemini/config/` with full `--dry-run` preview support.
 - **Smart Session Initialization (`hooks/session-start.sh`)**:
   - **Caveman Full Mode**: Default terse, token-efficient communication.
   - **Korean UX Enforcement**: Mandatory Korean responses for AI output while preserving technical symbols/code in English.
@@ -47,14 +47,14 @@ agy-rig/
 
 | Command / Skill | Source | Purpose |
 | :--- | :--- | :--- |
-| `/waza:think` | Waza | Pre-build planning, architecture design & decision validation |
-| `/waza:check` | Waza | Code review, diff inspection, release gates & project audit |
-| `/waza:hunt` | Waza | Root cause diagnosis, bug fix & regression investigation |
-| `/waza:ui` | Waza | UI/UX design, visual polish & component styling |
-| `/waza:write` | Waza | Technical documentation, release notes & copywriting |
-| `/waza:learn` | Waza | Deep research, synthesizing material & compiling sources |
-| `/waza:read` | Waza | Extracting web URLs & reading PDF documents |
-| `/waza:health` | Waza | Engineering health audit & config drift check |
+| `/think` | Waza | Pre-build planning, architecture design & decision validation |
+| `/check` | Waza | Code review, diff inspection, release gates & project audit |
+| `/hunt` | Waza | Root cause diagnosis, bug fix & regression investigation |
+| `/ui` | Waza | UI/UX design, visual polish & component styling |
+| `/write` | Waza | Technical documentation, release notes & copywriting |
+| `/learn` | Waza | Deep research, synthesizing material & compiling sources |
+| `/read` | Waza | Extracting web URLs & reading PDF documents |
+| `/health` | Waza | Engineering health audit & config drift check |
 | `/caveman` | Local | Switch communication intensity (`lite`, `full`, `ultra`) |
 | `simplify` | Local | Refactor code for clarity without altering behavior |
 | `using-superpowers` | Local | Meta-skill enforcing skill invocation before action |
