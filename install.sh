@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 
 # Antigravity Personal Environment Setup Script
-# Configures symlinks from agy-rig repository to ~/.gemini/config/
 
 set -euo pipefail
 
 DRY_RUN=false
-
 for arg in "$@"; do
     case $arg in
         --dry-run|-d)
@@ -19,24 +17,19 @@ done
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET_DIR="${HOME}/.gemini/config"
 
-echo "=========================================="
-echo " Antigravity Environment Setup"
-echo " Repo Dir  : ${SCRIPT_DIR}"
-echo " Target Dir: ${TARGET_DIR}"
 if [ "$DRY_RUN" = true ]; then
-    echo " MODE      : DRY-RUN (Preview Only)"
+    echo "[DRY-RUN] Previewing Antigravity environment setup..."
 else
-    echo " MODE      : INSTALLATION"
+    echo "[SETUP] Installing Antigravity environment..."
 fi
-echo "=========================================="
 
-# Auto-update Waza plugin if git repository exists
+# Auto-update Waza plugin
 if [ -d "${SCRIPT_DIR}/plugins/waza/.git" ]; then
     if [ "$DRY_RUN" = true ]; then
-        echo "[DRY-RUN] Would update Waza plugin via git pull"
+        echo "[DRY-RUN] Would pull latest Waza updates via git"
     else
-        echo "[UPDATE] Pulling latest Waza updates..."
-        git -C "${SCRIPT_DIR}/plugins/waza" pull --quiet || echo "[WARN] Failed to pull Waza updates"
+        echo "[UPDATE] Pulling Waza updates..."
+        git -C "${SCRIPT_DIR}/plugins/waza" pull --quiet || echo "[WARN] Failed Waza git pull"
     fi
 fi
 
@@ -47,34 +40,31 @@ make_symlink() {
     dst_dir="$(dirname "$dst")"
 
     if [ "$DRY_RUN" = true ]; then
-        echo "[DRY-RUN] Ensure directory: ${dst_dir}"
-        echo "[DRY-RUN] Create symlink : ${dst} -> ${src}"
+        echo "[DRY-RUN] Link: ${dst} -> ${src}"
     else
         mkdir -p "${dst_dir}"
         if [ -e "${dst}" ] || [ -L "${dst}" ]; then
             rm -rf "${dst}"
         fi
         ln -sfn "${src}" "${dst}"
-        echo "[SUCCESS] Linked ${dst} -> ${src}"
+        echo "[LINKED] ${dst#$HOME/} -> ${src}"
     fi
 }
 
-# 1. Base Config Files
+# Config files
 make_symlink "${SCRIPT_DIR}/config/mcp_config.json" "${TARGET_DIR}/mcp_config.json"
 make_symlink "${SCRIPT_DIR}/config/hooks.json" "${TARGET_DIR}/hooks.json"
 
-# 2. Hooks
+# Hooks & Rules
 make_symlink "${SCRIPT_DIR}/hooks/session-start.sh" "${TARGET_DIR}/hooks/session-start.sh"
-
-# 3. Rules
 make_symlink "${SCRIPT_DIR}/rules/korean-ux.md" "${TARGET_DIR}/rules/korean-ux.md"
 
-# 4. Plugins
+# Plugins
 if [ -d "${SCRIPT_DIR}/plugins/waza" ]; then
     make_symlink "${SCRIPT_DIR}/plugins/waza" "${TARGET_DIR}/plugins/waza"
 fi
 
-# 5. Local Skills (skills/)
+# Local Skills
 if [ -d "${SCRIPT_DIR}/skills" ]; then
     for skill_path in "${SCRIPT_DIR}/skills/"*; do
         if [ -d "${skill_path}" ]; then
@@ -84,7 +74,7 @@ if [ -d "${SCRIPT_DIR}/skills" ]; then
     done
 fi
 
-# 6. Waza Skills (plugins/waza/skills/)
+# Waza Skills
 if [ -d "${SCRIPT_DIR}/plugins/waza/skills" ]; then
     for skill_path in "${SCRIPT_DIR}/plugins/waza/skills/"*; do
         if [ -d "${skill_path}" ]; then
@@ -96,7 +86,7 @@ fi
 
 echo ""
 if [ "$DRY_RUN" = true ]; then
-    echo "Dry-run complete. No changes were made."
+    echo "[OK] Dry-run preview complete."
 else
-    echo "Installation complete. Antigravity environment is configured!"
+    echo "[OK] Antigravity environment setup complete."
 fi
