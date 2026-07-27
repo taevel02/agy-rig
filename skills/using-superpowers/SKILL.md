@@ -33,9 +33,9 @@ Process skills set the approach; execution skills carry out specific tasks. Alwa
 - **Research / Synthesis / Material compilation**: `/learn`
 - **Fetching URLs / Reading PDFs**: `/read`
 - **Engineering health audit / Config check**: `/health`
-- **Code refactoring for clarity & simplicity**: `simplify`
-- **Terse token-saving response mode**: `caveman`
-- **Atomic 1-line git commits on work unit completion**: `using-atomic-commit`
+- **Code refactoring for clarity & simplicity**: `/simplify`
+- **Terse token-saving response mode**: `/caveman`
+- **Atomic 1-line git commits on work unit completion**: `/using-atomic-commit`
 
 ## Red Flags (Anti-Rationalization Gate)
 

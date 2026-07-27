@@ -48,9 +48,9 @@ Apply symlinks to `~/.gemini/config/`:
 | `/read` | Waza | Extracting web URLs & reading PDF documents |
 | `/health` | Waza | Engineering health audit & config drift check |
 | `/caveman` | Local | Switch communication intensity (`lite`, `full`, `ultra`) |
-| `simplify` | Local | Refactor code for clarity without altering behavior |
-| `using-superpowers` | Local | Meta-skill enforcing skill invocation before action |
-| `using-atomic-commit` | Local | Enforces 1-line atomic commits on work unit completion |
+| `/simplify` | Local | Refactor code for clarity without altering behavior |
+| `/using-superpowers` | Local | Meta-skill enforcing skill invocation before action |
+| `/using-atomic-commit` | Local | Enforces 1-line atomic commits conforming to Conventional Commits v1.0.0 |
 
 ---
 
