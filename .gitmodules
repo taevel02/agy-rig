@@ -1,0 +1,3 @@
+[submodule "plugins/waza"]
+	path = plugins/waza
+	url = https://github.com/tw93/Waza.git

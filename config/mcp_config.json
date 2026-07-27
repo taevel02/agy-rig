@@ -2,15 +2,15 @@
   "mcpServers": {
     "chrome-devtools": {
       "command": "npx",
-      "args": ["-y", "@chrome-devtools/mcp-server"]
+      "args": ["-y", "chrome-devtools-mcp"]
     },
     "context7": {
       "command": "npx",
-      "args": ["-y", "@context7/mcp-server"]
+      "args": ["-y", "ctx7"]
     },
     "playwright": {
       "command": "npx",
-      "args": ["-y", "@playwright/mcp-server"]
+      "args": ["-y", "@playwright/mcp@latest"]
     }
   }
 }

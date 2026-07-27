@@ -30,6 +30,16 @@ else
 fi
 echo "=========================================="
 
+# Auto-update Waza plugin if git repository exists
+if [ -d "${SCRIPT_DIR}/plugins/waza/.git" ]; then
+    if [ "$DRY_RUN" = true ]; then
+        echo "[DRY-RUN] Would update Waza plugin via git pull"
+    else
+        echo "[UPDATE] Pulling latest Waza updates..."
+        git -C "${SCRIPT_DIR}/plugins/waza" pull --quiet || echo "[WARN] Failed to pull Waza updates"
+    fi
+fi
+
 make_symlink() {
     local src="$1"
     local dst="$2"
@@ -52,7 +62,6 @@ make_symlink() {
 # 1. Base Config Files
 make_symlink "${SCRIPT_DIR}/config/mcp_config.json" "${TARGET_DIR}/mcp_config.json"
 make_symlink "${SCRIPT_DIR}/config/hooks.json" "${TARGET_DIR}/hooks.json"
-make_symlink "${SCRIPT_DIR}/config/GEMINI.md" "${TARGET_DIR}/GEMINI.md"
 
 # 2. Hooks
 make_symlink "${SCRIPT_DIR}/hooks/session-start.sh" "${TARGET_DIR}/hooks/session-start.sh"
@@ -60,10 +69,12 @@ make_symlink "${SCRIPT_DIR}/hooks/session-start.sh" "${TARGET_DIR}/hooks/session
 # 3. Rules
 make_symlink "${SCRIPT_DIR}/rules/korean-ux.md" "${TARGET_DIR}/rules/korean-ux.md"
 
-# 4. Plugins
-make_symlink "${SCRIPT_DIR}/plugins/waza" "${TARGET_DIR}/plugins/waza"
+# 4. Plugins (Upstream Waza)
+if [ -d "${SCRIPT_DIR}/plugins/waza" ]; then
+    make_symlink "${SCRIPT_DIR}/plugins/waza" "${TARGET_DIR}/plugins/waza"
+fi
 
-# 5. Built-in Skills (All under skills/)
+# 5. Built-in Skills
 if [ -d "${SCRIPT_DIR}/skills/simplify" ]; then
     make_symlink "${SCRIPT_DIR}/skills/simplify" "${TARGET_DIR}/skills/simplify"
 fi
