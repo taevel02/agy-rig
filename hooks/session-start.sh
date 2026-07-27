@@ -11,6 +11,13 @@ else
     using_superpowers_content="Error: using-superpowers skill file not found."
 fi
 
+atomic_commit_file="${CONFIG_ROOT}/skills/using-atomic-commit/SKILL.md"
+if [ -f "$atomic_commit_file" ]; then
+    using_atomic_commit_content=$(cat "$atomic_commit_file")
+else
+    using_atomic_commit_content="Error: using-atomic-commit skill file not found."
+fi
+
 escape_for_json() {
     local s="$1"
     s="${s//\\/\\\\}"
@@ -22,13 +29,16 @@ escape_for_json() {
 }
 
 using_superpowers_escaped=$(escape_for_json "$using_superpowers_content")
+using_atomic_commit_escaped=$(escape_for_json "$using_atomic_commit_content")
 
 session_context="<EXTREMELY_IMPORTANT>
-You have superpowers.
+You have superpowers and atomic commit capabilities.
 
-**Below is the full content of your 'using-superpowers' skill - your introduction to using skills:**
-
+**1. Below is the full content of your 'using-superpowers' skill:**
 ${using_superpowers_escaped}
+
+**2. Below is the full content of your 'using-atomic-commit' skill:**
+${using_atomic_escaped:-$using_atomic_commit_escaped}
 
 [Session Operational Directives]
 1. UX & Language Rule:
@@ -38,12 +48,6 @@ ${using_superpowers_escaped}
 2. Caveman Full Mode:
    - Always respond in 'caveman full' mode by default to conserve token budget.
    - Omit fluff, pleasantries, filler phrases, and redundant recaps. State facts directly and tersely.
-
-3. Atomic Commit Standard:
-   - Make small, 1-line git commits ('type: concise summary') without narrative bloat.
-
-4. Git Worktree Preference:
-   - Prefer using git worktree for isolated feature tasks or experimental work.
 </EXTREMELY_IMPORTANT>"
 
 session_context_escaped=$(escape_for_json "$session_context")
@@ -51,7 +55,7 @@ session_context_escaped=$(escape_for_json "$session_context")
 cat <<EOF
 {
   "decision": "allow",
-  "reason": "Session initialized with superpowers, caveman full, atomic commit, git worktree, and Korean UX",
+  "reason": "Session initialized with superpowers, atomic commit skill, caveman full, and Korean UX",
   "additionalContext": "$session_context_escaped"
 }
 EOF

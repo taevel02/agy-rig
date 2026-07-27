@@ -10,8 +10,7 @@
 - **Smart Session Initialization (`hooks/session-start.sh`)**:
   - **Caveman Full Mode**: Default terse, token-efficient communication.
   - **Korean UX Enforcement**: Mandatory Korean responses for AI output while preserving technical symbols/code in English.
-  - **Atomic Commit Standard**: Guidance for 1-line concise git commits.
-  - **Git Worktree Preference**: Best-practice workflow for isolated task execution.
+  - **Atomic Commit Enforcement**: Automatic loading of `using-atomic-commit` skill for fast 1-line commits.
 - **Upstream Waza Integration**: Git Submodule tracking `tw93/Waza` with individual skill symlinking and automatic `git pull` updates on install.
 - **Configured MCP Servers**:
   - `chrome-devtools`: `chrome-devtools-mcp`
@@ -51,6 +50,7 @@ Apply symlinks to `~/.gemini/config/`:
 | `/caveman` | Local | Switch communication intensity (`lite`, `full`, `ultra`) |
 | `simplify` | Local | Refactor code for clarity without altering behavior |
 | `using-superpowers` | Local | Meta-skill enforcing skill invocation before action |
+| `using-atomic-commit` | Local | Enforces 1-line atomic commits on work unit completion |
 
 ---
 
