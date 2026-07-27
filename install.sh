@@ -63,13 +63,13 @@ make_symlink "${SCRIPT_DIR}/rules/korean-ux.md" "${TARGET_DIR}/rules/korean-ux.m
 # 4. Plugins
 make_symlink "${SCRIPT_DIR}/plugins/waza" "${TARGET_DIR}/plugins/waza"
 
-# 5. Built-in Skills
-if [ -d "${SCRIPT_DIR}/simplify" ]; then
-    make_symlink "${SCRIPT_DIR}/simplify" "${TARGET_DIR}/skills/simplify"
+# 5. Built-in Skills (All under skills/)
+if [ -d "${SCRIPT_DIR}/skills/simplify" ]; then
+    make_symlink "${SCRIPT_DIR}/skills/simplify" "${TARGET_DIR}/skills/simplify"
 fi
 
-if [ -d "${SCRIPT_DIR}/caveman" ]; then
-    make_symlink "${SCRIPT_DIR}/caveman" "${TARGET_DIR}/skills/caveman"
+if [ -d "${SCRIPT_DIR}/skills/caveman" ]; then
+    make_symlink "${SCRIPT_DIR}/skills/caveman" "${TARGET_DIR}/skills/caveman"
 fi
 
 if [ -d "${SCRIPT_DIR}/skills/using-superpowers" ]; then

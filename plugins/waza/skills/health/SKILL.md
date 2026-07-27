@@ -1,8 +1,6 @@
 ---
 name: health
 description: "Runs a budget-aware agent-assisted engineering health audit for instruction/config drift, hooks/MCP, verifier surfaces, and AI maintainability. Use when users ask in any language to audit Claude, Codex, Pi, agent instructions, MCP or hooks, verifier coverage, or AI-maintainability drift. Not for debugging application code or reviewing PRs."
-when_to_use: "Claude 점검, Codex 점검, Pi 점검, Codex 설정, Pi 설정, AGENTS.md, config.toml, agent instructions, 건강도, 설정 점검, 설정 유효성 검사, AI 코딩 부패, 코드 품질 저하, 유지보수성, 컨텍스트 혼란, 검증 누락, 검증 명령어 오류, Claude ignoring instructions, Pi coding agent, check config, settings not working, audit config"
-dispatch_intent: "Codex/Claude/Pi ignoring instructions, agent config audit, hooks/MCP broken, health token usage, AI coding code rot, hotspot ownership, unclear context, missing verification, stale verifier output"
 ---
 
 # Health: Agent-Assisted Engineering Health
@@ -11,7 +9,6 @@ Prefix your first line with 🥷 inline, not as its own paragraph.
 
 **Always respond in Korean (한국어).**
 
-**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.
 
 Audit the current project's agent setup and AI coding maintainability against this framework:
 `agent config → instruction surfaces → tools/runtime → verifiers → maintainability`
@@ -36,7 +33,7 @@ Two lanes share one report:
 
 ## Durable Context Preflight
 
-See [references/durable-context.md](references/durable-context.md) for when to read durable context, the read-order budget, and the memory-type mapping.
+ for when to read durable context, the read-order budget, and the memory-type mapping.
 
 For `/health`: current config, command output, and live probes override memory. Also flag durable memory problems when they affect behavior: oversized injected summaries, stale or contradictory entries, missing project entrypoint references, or private paths copied into public instructions. Keep these as context findings, not code-review findings.
 
@@ -56,11 +53,11 @@ Run the collection script in summary mode first. Do not interpret yet.
 
 ```bash
 # Resolve collect-data.sh from canonical locations (no personal home-dir paths).
-HEALTH_SCRIPT="${CLAUDE_SKILL_DIR:+$CLAUDE_SKILL_DIR/scripts/collect-data.sh}"
+HEALTH_SCRIPT="${CLAUDE_SKILL_DIR:+$CLAUDE_SKILL_DIR/project scripts}"
 if [ ! -f "${HEALTH_SCRIPT:-}" ]; then
   for candidate in \
-    "./skills/health/scripts/collect-data.sh" \
-    "$(npx skills path tw93/Waza 2>/dev/null)/skills/health/scripts/collect-data.sh"; do
+    "./skills/health/project scripts" \
+    "$(npx skills path tw93/Waza 2>/dev/null)/skills/health/project scripts"; do
     [ -f "$candidate" ] && HEALTH_SCRIPT="$candidate" && break
   done
 fi
@@ -68,7 +65,6 @@ if [ ! -f "${HEALTH_SCRIPT:-}" ]; then
   echo "health collect-data.sh not found; set CLAUDE_SKILL_DIR or reinstall: npx skills add tw93/Waza -a claude-code -g -y"
   exit 1
 fi
-bash "$HEALTH_SCRIPT"
 ```
 
 Sections may show `(unavailable)` when tools are missing:
@@ -129,7 +125,6 @@ Confirm the tier. Then route:
 
 - **Simple:** Analyze locally. No subagents.
 - **Standard:** Analyze locally from the summary output. Do not launch subagents by default. If the user asks for a deep/full/thorough audit, or if local analysis cannot classify a security/control issue, escalate to deep mode and explain the likely token cost.
-- **Complex, remembered deep preference, explicit deep audit, or explicit AI maintainability audit:** Re-run collection with `bash "$HEALTH_SCRIPT" auto deep`, then launch the relevant subagents in parallel. Redact credentials to `[REDACTED]`.
   - **Agent 1** (Context + Security): Read `agents/inspector-context.md`. Feed `CONVERSATION SIGNALS` section.
   - **Agent 2** (Control + Behavior): Read `agents/inspector-control.md`. Feed detected tier.
   - **Agent 3** (AI Maintainability): Read `agents/inspector-maintainability.md`. Feed only `TIER METRICS`, `AI MAINTAINABILITY SUMMARY` or `AI MAINTAINABILITY DETAIL`, and the script hotspot lists. Launch this agent only for deep health audits, Complex projects, or explicit code-rot/AI-maintainability requests.
@@ -213,12 +208,12 @@ bash "$(dirname "$HEALTH_SCRIPT")/check-maintainability.sh" . deep
 
 Keep actions concrete and non-invasive: add or fix the smallest useful instruction surface, add one executable validation command, document hotspot ownership and tests, split only when the boundary is already clear, or repair the broken reference. Do not propose broad rewrites from the script output alone.
 
-**Broken doc references.** Scan `AGENTS.md`, `CLAUDE.md`, `.claude/rules/*.md`, and every `.claude/skills/*/SKILL.md` for references shaped like `@<path>`, `~/.claude/rules/<name>.md`, `~/.claude/skills/<name>/`, `docs/<name>.md`, or `references/<name>.md`. For each match, check that the target exists on disk. Report every "referenced but missing" pointer with the source file and line.
+**Broken doc references.** Scan `AGENTS.md`, `CLAUDE.md`, `.claude/rules/*.md`, and every `.claude/skills/*/SKILL.md` for references shaped like `@<path>`, `~/.claude/rules/<name>.md`, `~/.claude/skills/<name>/`, `docs/<name>.md`, or the skill reference guidelines. For each match, check that the target exists on disk. Report every "referenced but missing" pointer with the source file and line.
 
 Common offenders:
 - A project-level rule references a global rule file that was never created (e.g. `~/.claude/rules/swift.md`).
 - A `CLAUDE.md` uses an `@AGENTS.md` placeholder but the actual `AGENTS.md` is missing or empty.
-- A skill body references `references/<name>.md` but only `references/<name>-v2.md` exists.
+- A skill body references the skill reference guidelines but only the skill reference guidelines exists.
 - A rule file references a deleted skill path.
 
 Quick check from the project root, reusing `$HEALTH_SCRIPT` resolved in Step 1:
@@ -227,7 +222,7 @@ Quick check from the project root, reusing `$HEALTH_SCRIPT` resolved in Step 1:
 bash "$(dirname "$HEALTH_SCRIPT")/check-doc-refs.sh" .
 ```
 
-The checker resolves `@...` and `docs/...` from the project root, expands `~`, resolves `references/...` from each `.claude/skills/<name>/SKILL.md` directory, checks every reference on a line, skips fenced code examples, and exits non-zero when any target is missing.
+The checker resolves `@...` and `docs/...` from the project root, expands `~`, resolves the skill reference guidelines from each `.claude/skills/<name>/SKILL.md` directory, checks every reference on a line, skips fenced code examples, and exits non-zero when any target is missing.
 
 Report missing references as Structural findings, not Critical, unless the missing file is named as a hard dependency (e.g. `release.md` for the project's release skill).
 

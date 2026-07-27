@@ -1,8 +1,6 @@
 ---
 name: check
 description: "Reviews code diffs, PRs, issue queues, release readiness, commits, pushes, publishing, and project audits. Use when users ask in any language for code review, issue or PR triage, release gates, publishing follow-through, or project audits. Not for debugging root causes or prose review."
-when_to_use: "review, 코드 검토, 점검, 문제 확인, 최적화 필요 여부, 머지 전, 지속적 최적화, 코드 최적화, 이슈 확인, PR 확인, release, publish, push, release reaction, GitHub reaction, 배포, 커밋, 이슈 닫기, 배포表情, 릴리즈 리액션, close issue, issue close, review my code, check changes, before merge, before release, 值得배포, ready to release, code review, code-review, audit, project audit, 프로젝트 헬스체크, 프로젝트 점수 측정, 프로젝트 평가, 프로젝트 심층 분석, 코드 품질 평가, 코드 품질 점수, scorecard, linus review, rate this codebase, score this project"
-dispatch_intent: "Code review, before merge, release gates, generated artifacts, safety sinks, publish/push/reaction follow-through, triage issues/PRs, project-wide code-quality audit scorecard"
 ---
 
 # Check: Review Before You Ship
@@ -11,7 +9,6 @@ Prefix your first line with 🥷 inline, not as its own paragraph.
 
 **Always respond in Korean (한국어).**
 
-**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.
 
 > Note: `/review` is a built-in Anthropic plugin command for PR review. Waza uses `/check` (or the alias `code-review`) instead. Do not re-trigger `/review` from within this skill.
 
@@ -51,8 +48,8 @@ Pick the mode that matches the user's intent, then read that section in full. Mo
 | "implement this plan", `/think` output handed off | [Plan Execution](#plan-execution-mode) |
 | Diff or PR ready, "review", "코드 검토", "머지 전" | Default review (start at [Get the Diff](#get-the-diff)) |
 | "look at issues", "review PRs", "triage", "일괄 처리" | [Triage Mode](#triage-mode) |
-| "is this worth a release", "가치 평가发版" | [Release Worthiness Analysis](#release-worthiness-analysis) |
-| "commit", "push", "publish", "release", "close issue", "배포表情" | [Ship / Release Follow-through](#ship--release-follow-through) |
+| "is this worth a release", "가치 평가" | [Release Worthiness Analysis](#release-worthiness-analysis) |
+| "commit", "push", "publish", "release", "close issue", "배포" | [Ship / Release Follow-through](#ship--release-follow-through) |
 | "audit", "프로젝트 헬스체크", "프로젝트 점수 측정", "프로젝트 평가", "프로젝트 심층 분석", "scorecard", "linus review" | [Project Audit](#project-audit-mode) |
 | Document, PDF, prose review | Delegate to `/write` (see [Document Review](#document-review)) |
 
@@ -70,13 +67,13 @@ Before reviewing, extract project constraints from repository context:
 4. Apply the stricter rule when project context and this skill overlap.
 5. If project docs or CI name a verification command, prefer that over auto-detection.
 
-For the context shape, see `references/project-context.md`.
+For the context shape, see the skill reference guidelines.
 
-For release or maintainer work, also fill the Release Gate 2.0 matrix from `references/project-context.md`. It covers review base, dirty/staged/untracked state, latest tag, origin sync, version fields, generated artifacts, package/archive contents, release assets, registry/appcast/CI, and public issue/PR state. Missing matrix evidence is a blocker for a "ready to release" claim.
+For release or maintainer work, also fill the Release Gate 2.0 matrix . It covers review base, dirty/staged/untracked state, latest tag, origin sync, version fields, generated artifacts, package/archive contents, release assets, registry/appcast/CI, and public issue/PR state. Missing matrix evidence is a blocker for a "ready to release" claim.
 
 ## Durable Context Preflight
 
-See [references/durable-context.md](references/durable-context.md) for when to read durable context, the read-order budget, and the memory-type mapping.
+ for when to read durable context, the read-order budget, and the memory-type mapping.
 
 For `/check`: the current diff, CI, and remote state override memory. Durable memory can explain user intent and preferred follow-through, but public project rules still come from README files, manifests, CI workflows, release docs, and explicit instructions in the current thread. Never cite private memory as a public project requirement.
 
@@ -115,7 +112,7 @@ Before final conclusions in a live queue, refresh the issue/PR list once more an
 
 **PR handling:** If the PR direction is accepted but the patch needs changes, prefer pushing the maintainer's fixes to the contributor's PR branch and then merging the PR. Check `maintainerCanModify` first, then confirm the push remote, target branch, and current HEAD immediately before pushing so you do not overwrite contributor work or push maintainer fixes to the wrong repository. If branch edits are not allowed, ask the contributor to enable maintainer edits or push the needed revision; only fall back to a separate maintainer commit when timing or release safety requires it, and say so in the PR. Close without merging only when the direction is rejected, unsafe, no longer needed, or explicitly not part of the project's scope. Do not silently absorb an accepted PR into `main` and close it.
 
-**Public reply shape:** load `references/public-reply.md` for the full template (mention, single thanks, factual paragraphs, next-release step, editing rules, closure criteria). Ship Mode uses the same template; the file is the single source.
+**Public reply shape:**  for the full template (mention, single thanks, factual paragraphs, next-release step, editing rules, closure criteria). Ship Mode uses the same template; the file is the single source.
 
 **Sign-off line (append to standard sign-off):**
 ```
@@ -124,7 +121,7 @@ triage:           N reviewed, N closed, N deferred
 
 ## Release Worthiness Analysis
 
-Activate when the user asks "심층分析 X 是不是值得发新版本", "is this worth a new release", "가치 평가发版", or similar.
+Activate when the user asks "심층 X ", "is this worth a new release", "가치 평가", or similar.
 
 Classify every commit since the last published tag (the tag is the baseline, not a local VERSION file), then output:
 
@@ -142,7 +139,6 @@ Activate when the user asks to commit, tag, release, publish, push, reply on an 
 This mode extends review; it does not skip review. Before any public or irreversible action:
 
 1. Extract release rules from public project context: README, manifests, CI workflows, release notes, package scripts, changelogs, and explicit user instructions in the current thread.
-2. Fill the Release Gate 2.0 matrix from `references/project-context.md`. Seed the deterministic rows with `python3 <skill-base-dir>/scripts/release_gate.py --root <project>` (worktree state, remote sync, tag baseline, version field sync, changelog mention) and paste its status lines as evidence; the remaining rows (generated artifacts, package/archive contents, release assets, registry/appcast/CI, public issue/PR state) stay judgment calls with their own evidence.
 3. Verify generated or bundled outputs, version fields, release notes, package contents, and required artifacts are in sync. Prefer dry-run commands when the ecosystem provides them. When drafting release notes or update-feed copy, follow `/write` Release Note Template Mode; for Chinese copy, load its zh release-notes rules before the first draft, not after a tone complaint -- translation-flavored Chinese notes are a defect, not a polish item.
    Before drafting release notes, read the repo's previous published release (`gh release view` the latest tag) and treat its title convention, item count, per-item length, and language layout as the hard template; replace content only, never invent a new format.
    Generated deliverables include tracked archives, ignored dist files, appcasts, site/download copy, registry packages, checksums, and release assets. If project docs require them, regenerate, inspect, and stage or upload them explicitly even when they are ignored by git; do not infer readiness from source-only tests. For remote assets, prefer downloading or reading back the published artifact and comparing entries, checksums, or manifest contents; release page text, file size, or workflow success alone is not artifact proof.
@@ -150,23 +146,22 @@ This mode extends review; it does not skip review. Before any public or irrevers
    Classify each change by deployment surface before concluding what is live: code that ships inside a packaged artifact (app binary, bundled CLI, release archive) reaches users only at the next release, while sites, serverless functions, CDN config, and infrastructure deploy automatically when the default branch updates. One batch of changes can be unreleased on the first surface and already in production on the second; state each surface separately instead of letting "not released yet" cover auto-deployed code.
 4. Commit only intended files. Preserve unrelated dirty work, serialize git operations so index locks or overlapping adds do not corrupt the workflow, and re-check HEAD/status before pushing so concurrent agent or maintainer commits are not swept into your ship action.
 5. Push, publish, tag, or create a release only when the user has explicitly approved that action. If auth, OTP, CI, registry, or network state blocks the operation, pause and report the exact blocker.
-6. For issue/PR follow-through, confirm the item identity with the host's read command before posting. On GitHub, use `gh issue view` or `gh pr view`; on other hosts, use the CLI/API named by project docs or the current request. Use `references/public-reply.md` for the maintainer reply template (mention, single thanks, facts, explicit next release or verification step) and its closure criteria.
+6. For issue/PR follow-through, confirm the item identity with the host's read command before posting. On GitHub, use `gh issue view` or `gh pr view`; on other hosts, use the CLI/API named by project docs or the current request. Use the skill reference guidelines for the maintainer reply template (mention, single thanks, facts, explicit next release or verification step) and its closure criteria.
 7. For GitHub release reaction follow-through, only do it when project context or the current thread asks for it. After the release exists and required assets are verified, resolve the release id from the tag, POST every positive release reaction to `repos/<owner>/<repo>/releases/<id>/reactions` with `gh api` or the available GitHub tool, and re-read reactions to confirm. Positive release reactions are `+1`, `laugh`, `heart`, `hooray`, `rocket`, and `eyes`.
 8. After network or API failures, re-read the end state instead of assuming success or failure.
 
 ### Reworked Or Cancelled Release Gate
 
-Activate this gate when a release candidate was cancelled, a preview or beta had repeated bug-fix churn, or the user asks whether a delayed release is finally safe. Load `references/release-surfaces.md` (Reworked Or Cancelled Release Gate): review from the last public stable tag through `HEAD` by shipped risk surface, and output two decisions, whether the preview keeps taking user testing and whether stable release prep can start.
+Activate this gate when a release candidate was cancelled, a preview or beta had repeated bug-fix churn, or the user asks whether a delayed release is finally safe. Load the skill reference guidelines (Reworked Or Cancelled Release Gate): review from the last public stable tag through `HEAD` by shipped risk surface, and output two decisions, whether the preview keeps taking user testing and whether stable release prep can start.
 
 Lead the verdict with an explicit go / no-go (ship, or the named blockers), then the concrete shipped state: commit hash, tag, release URL, registry/version result, pushed branch, release asset state, release reaction state, issue/PR state, and any remaining blockers. Omit fields that do not apply.
 
 ## Project Audit Mode
 
-Activate when the user asks for a project-wide code-quality scorecard: "audit", "프로젝트 헬스체크", "코드 품질 점수", "scorecard", "linus 风格 review". Distinct from Default Review (PR/diff scoped) and Triage (issue batching). Single-pass project-wide quality assessment.
+Activate when the user asks for a project-wide code-quality scorecard: "audit", "프로젝트 헬스체크", "코드 품질 점수", "scorecard", "linus  review". Distinct from Default Review (PR/diff scoped) and Triage (issue batching). Single-pass project-wide quality assessment.
 
 **Flow**
 
-1. Run `python3 <skill-base-dir>/scripts/audit_signals.py --root <project>` from the target repo, with `<skill-base-dir>` replaced by this skill's base directory. The script emits labelled blocks (`=== FILE SIZE HOTSPOTS ===` ... `=== DENYLIST IN BUILD ===`) each ending with `status: PASS|WARN|FAIL|N/A`.
 2. Skim the largest source files surfaced by `FILE SIZE HOTSPOTS` (typically 3-5; stop sooner if the architecture is already clear).
 3. Read `CLAUDE.md` / `AGENTS.md` / `README.md` to learn the project's own stated conventions before judging it against generic ones. The repo's agent guidance itself is part of the audited surface: verify its commands and paths still exist, and report stale, conflicting, or deletable rules as findings.
 4. Apply the four-axis rubric below. Each axis is independently scored 0-10. Overall = arithmetic mean.
@@ -255,13 +250,13 @@ When the diff fixes a visual, layout, timing, or stateful-UI bug that has recurr
 
 ## CLI Command Surface
 
-When a diff touches a CLI entrypoint, installer, completion, config/env handling, package wrapper, or a mutating command such as cleanup, update, uninstall, migration, or cache removal, load `references/release-surfaces.md` (CLI Command Surface) and work its checklist, then fill the CLI Command Surface template from `references/project-context.md` before sign-off. The core stance: verify command contract and installed-runtime behavior, not just library tests, and treat every mutating command as a safety sink.
+When a diff touches a CLI entrypoint, installer, completion, config/env handling, package wrapper, or a mutating command such as cleanup, update, uninstall, migration, or cache removal,  (CLI Command Surface) and work its checklist, then fill the CLI Command Surface template  before sign-off. The core stance: verify command contract and installed-runtime behavior, not just library tests, and treat every mutating command as a safety sink.
 
 Terminal output is a rendered surface. After changing CLI-facing text, spacing, or layout, re-run the command and read the real output before claiming done; editing the string is not seeing the screen.
 
 ## Skill, Plugin, And Packaged Install Surface
 
-When a diff touches a skill, plugin, marketplace entry, installer, package allowlist, package manifest, generated mirror, or published archive, load `references/release-surfaces.md` (Packaged Install Surface) and verify the installed runtime contract through its five steps: real user install path, rebuilt package contents, isolated install smoke, noise filtering, and explicit gaps when the smoke cannot run. Manifest JSON, source tests, or a successful local import never substitute for installed-runtime proof.
+When a diff touches a skill, plugin, marketplace entry, installer, package allowlist, package manifest, generated mirror, or published archive,  (Packaged Install Surface) and verify the installed runtime contract through its five steps: real user install path, rebuilt package contents, isolated install smoke, noise filtering, and explicit gaps when the smoke cannot run. Manifest JSON, source tests, or a successful local import never substitute for installed-runtime proof.
 
 ## Hard Stops (fix before merging)
 
@@ -328,7 +323,7 @@ If found, either apply the doc update as `safe_auto` (when the invariant is clea
 
 ## Specialist Review (Standard and Deep only)
 
-Load `references/persona-catalog.md` to determine which specialists activate. When the environment has an agent or sub-agent facility, launch all activated specialists in parallel, each with the full diff and its own persona brief. If no parallel reviewer facility exists, run the specialist passes sequentially in the same session.
+Load the skill reference guidelines to determine which specialists activate. When the environment has an agent or sub-agent facility, launch all activated specialists in parallel, each with the full diff and its own persona brief. If no parallel reviewer facility exists, run the specialist passes sequentially in the same session.
 
 Merge findings: when two specialists flag the same code location, keep the higher severity and note cross-reviewer agreement. Findings on different code locations are never duplicates even if they share a theme.
 
@@ -347,7 +342,7 @@ Apply all `safe_auto` fixes before surfacing the `gated_auto` confirmation block
 
 ## Adversarial Pass (Deep only)
 
-"If I were trying to break this system through this specific diff, what would I exploit?" Four angles (see `references/persona-catalog.md`): assumption violation, composition failures, cascade construction, abuse cases. When the agent facility exists, run the four angles as parallel agents, each blind to the others' findings: convergence from independent angles raises confidence, and singleton findings face the same per-finding skeptic verification as specialist claims. Suppress findings below 0.60 confidence.
+"If I were trying to break this system through this specific diff, what would I exploit?" Four angles : assumption violation, composition failures, cascade construction, abuse cases. When the agent facility exists, run the four angles as parallel agents, each blind to the others' findings: convergence from independent angles raises confidence, and singleton findings face the same per-finding skeptic verification as specialist claims. Suppress findings below 0.60 confidence.
 
 ## Platform Operations
 
@@ -357,7 +352,6 @@ Poll CI as structured state, not streamed text: `gh run view <id> --json status,
 
 ## Verification
 
-Run `bash <skill-base-dir>/scripts/run-tests.sh` from the target project root (`<skill-base-dir>` is this skill's base directory; the script auto-detects the project's test command from the current working directory), or the project's known verification command. Paste the full output.
 
 If the script exits non-zero or prints `(no test command detected)`: halt. Do not claim done. Ask the user for the verification command before proceeding. If the user also cannot provide one, document this explicitly in the sign-off as `verification: none -- no command available` and flag it as a structural gap, not a pass.
 
@@ -382,7 +376,7 @@ For document, PDF, white paper, or prose review, route to `/write` (Document Rev
 
 ## Sign-off
 
-Open the final message with the `status` line as plain prose before any table or detail: exactly where the work stands now, with the hash, tag, or blocker. A verdict buried under verification tables reads as unfinished and makes the user re-ask "都커밋了吗"; the tables support the verdict, they do not replace it.
+Open the final message with the `status` line as plain prose before any table or detail: exactly where the work stands now, with the hash, tag, or blocker. A verdict buried under verification tables reads as unfinished and makes the user re-ask "커밋"; the tables support the verdict, they do not replace it.
 
 ```
 status:           [committed and pushed as <hash> / staged, not committed / released vX.Y.Z / blocked on <what>]

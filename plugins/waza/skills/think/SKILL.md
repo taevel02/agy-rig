@@ -1,8 +1,6 @@
 ---
 name: think
 description: "Turns rough ideas into approved, decision-complete plans with validated structure before coding. Use when users ask in any language for planning, architecture, design direction, feasibility, value judgment, or whether a feature is worth doing before implementation. Not for bug fixes or small edits."
-when_to_use: "出方案, 给方案, 심층分析, 怎么设计, 用什么方案, 판단, 필요성 여부, 가치 평가, what's the best approach, plan this, how should I, should we keep this"
-dispatch_intent: "New feature, architecture, how should I design this, value judgment, executable plan, handoff"
 ---
 
 # Think: Design and Validate Before You Build
@@ -11,7 +9,6 @@ Prefix your first line with 🥷 inline, not as its own paragraph.
 
 **Always respond in Korean (한국어).**
 
-**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.
 
 Turn a rough idea into an approved plan. No code, no scaffolding, no pseudo-code until the user approves.
 
@@ -26,7 +23,7 @@ Give opinions directly. Take a position and state what evidence would change it.
 
 ## Durable Context Preflight
 
-See [references/durable-context.md](references/durable-context.md) for when to read durable context, the read-order budget, and the memory-type mapping (planning constraints, reusable patterns, facts that need re-verification against current state).
+ for when to read durable context, the read-order budget, and the memory-type mapping (planning constraints, reusable patterns, facts that need re-verification against current state).
 
 For `/think`: current repo state and live docs override memory. Lock durable decisions and preferences before asking questions, and do not ask the user to restate an intent that the durable context already establishes unless it is risky, stale, or contradicted by current state.
 
@@ -42,7 +39,7 @@ Upgrade to full mode if you find 3 or more genuinely different approaches with m
 
 ## Evaluation Mode
 
-Activate when the user wants to judge whether something should exist, be kept, exposed, or removed. Typical triggers: "판단", "필요성 여부", "가치 평가", "should we keep this", "is this worth it", "작업 보류", "비즈니스 전망", "필요성 여부继续".
+Activate when the user wants to judge whether something should exist, be kept, exposed, or removed. Typical triggers: "판단", "필요성 여부", "가치 평가", "should we keep this", "is this worth it", "작업 보류", "비즈니스 전망", "필요성 여부".
 
 State the evaluation target and what kind of judgment is needed (value, risk, or tradeoff). Take a current-state snapshot: what it does, who uses it, what depends on it; grep and read before opining.
 
@@ -158,7 +155,7 @@ When the user later says "Implement the plan", "진행 가능", "직접 수정",
 | User approved a concrete plan and the agent debated the plan again | Execute the approved plan. Only stop for repo drift, missing permissions, or unsafe external state |
 | Picked a regional or locale-specific API variant without checking | List all regional or locale differences before writing integration code |
 | Introduced a second language or runtime into a single-stack project | Never add a new language or runtime without explicit approval |
-| User said "판단这个报错" and got Evaluation Mode | "판단" + error/bug context = debugging, route to `/hunt`. Evaluation Mode is for value/existence judgments only |
+| User said "판단" and got Evaluation Mode | "판단" + error/bug context = debugging, route to `/hunt`. Evaluation Mode is for value/existence judgments only |
 | User asked to "Waza에 정착" after a project review | First separate transferable Waza capability from project facts. Do not import that project's commands, paths, or release rules into Waza |
 
 ## Output

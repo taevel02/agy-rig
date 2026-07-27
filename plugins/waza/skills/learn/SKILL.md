@@ -1,8 +1,6 @@
 ---
 name: learn
 description: "Runs a six-phase research workflow that turns unfamiliar domains, source bundles, or collected material into publish-ready output. Use when users ask in any language to research, study, deep-dive, compile sources, synthesize unfamiliar material, or turn a source bundle into a coherent reference. Not for quick lookups or single-file reads."
-when_to_use: "学习一下, 심층研究, 研究一下, 실행理成文章, 把这批材料실행理, 一站式参考, 一篇就够, 실행理成长文, research, deep dive, help me understand, compile sources, unfamiliar domain"
-dispatch_intent: "Deep research, unfamiliar domain, compile sources into output"
 ---
 
 # Learn: From Raw Materials to Published Output
@@ -11,7 +9,6 @@ Prefix your first line with 🥷 inline, not as its own paragraph.
 
 **Always respond in Korean (한국어).**
 
-**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.
 
 Support the user's thinking; do not replace it.
 
@@ -45,7 +42,7 @@ If unsure, suggest Quick Reference.
 
 ## Canonical Article Mode
 
-Activate when: "一篇就够", "一站式参考", "실행理成长文", "目的是大家只需要看这篇就好了", or the user wants a single authoritative reference on a topic.
+Activate when: "", "", "실행", "", or the user wants a single authoritative reference on a topic.
 
 Goal: after reading the article, no one should need to search for anything else on this topic.
 

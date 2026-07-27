@@ -1,8 +1,6 @@
 ---
 name: hunt
 description: "Finds root cause before applying fixes for errors, crashes, regressions, failing tests, broken behavior, and screenshot-reported defects. Use when users report in any language errors, crashes, broken behavior, regressions, failing tests, screenshot evidence, or something that used to work and now fails. Not for code review or new features."
-when_to_use: "排查, 查查, 报错, 崩溃, 不工作, 不对, 跑不通, 以前是好的, 回归, 截图回归, 判断错误原因, 判断为什么报错, 反复修不好, debug, regression, used to work, broke after update, why broken, not working, what's wrong, fix error, stack trace"
-dispatch_intent: "Error, crash, regression, screenshot-reported defect, test failure, stale cache, runtime boundary, why broken"
 ---
 
 # Hunt: Diagnose Before You Fix
@@ -11,7 +9,6 @@ Prefix your first line with 🥷 inline, not as its own paragraph.
 
 **Always respond in Korean (한국어).**
 
-**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.
 
 A patch applied to a symptom creates a new bug somewhere else.
 
@@ -35,7 +32,7 @@ Rationalization smells: "I'll just try this" = no hypothesis, write it first. "I
 
 ## Durable Context Preflight
 
-See [references/durable-context.md](references/durable-context.md) for when to read durable context, the read-order budget, and the memory-type mapping.
+ for when to read durable context, the read-order budget, and the memory-type mapping.
 
 For `/hunt`: durable context is hypothesis fuel only, and current code, logs, and repro evidence override memory. It never replaces a fresh root-cause sentence or a reproducible symptom list.
 
@@ -59,7 +56,7 @@ If the bug genuinely needs a refactor first (e.g. the cause cannot be addressed 
 
 ## Bisect Mode
 
-Activate when: "以前是好的", "之前是好的", "used to work", "上一次커밋还是对的", "broke after update", or the user remembers a specific good commit or version.
+Activate when: "", "", "used to work", "커밋", "broke after update", or the user remembers a specific good commit or version.
 
 - Protect the user's worktree first: `git status --short --branch -uall`. Any modified, staged, or untracked files mean no bisect in the current checkout: run it in a temporary detached worktree and remove that worktree when done. If a temporary worktree is impossible, stop and ask for explicit cleanup/stash approval.
 - If the last-good version is only a few releases back, `git diff <last-good>..HEAD -- <suspect path>` and read the delta first. The regression is usually visible there at a fraction of a bisect's cost; fall through to bisect only when the diff is too large or the culprit is not obvious.
@@ -69,13 +66,13 @@ Activate when: "以前是好的", "之前是好的", "used to work", "上一次�
 
 Activate when the user says the same issue is still wrong after a fix, provides a "good" screenshot/version/file, or describes a visual result as previously correct.
 
-Treat the reference as evidence, not decoration: list every reported and visible symptom in the user's concrete words ("still slow", "尖刺", "先显示上一个内容"); identify the reference oracle (last-good commit, old build, fixture, screenshot, described expected state); define the pass/fail check before editing; then name the exact current-vs-reference delta. Do not generalize a visual defect into "style polish" when the evidence points to a broken render, race, font pipeline, or state path. If the same symptom survives one attempted fix, stop and rebuild the hypothesis from the evidence; do not stack patches onto a disproven explanation.
+Treat the reference as evidence, not decoration: list every reported and visible symptom in the user's concrete words ("still slow", "", ""); identify the reference oracle (last-good commit, old build, fixture, screenshot, described expected state); define the pass/fail check before editing; then name the exact current-vs-reference delta. Do not generalize a visual defect into "style polish" when the evidence points to a broken render, race, font pipeline, or state path. If the same symptom survives one attempted fix, stop and rebuild the hypothesis from the evidence; do not stack patches onto a disproven explanation.
 
 If the issue is purely subjective UI taste, route to `/ui`. If it is rendering, state, timing, build output, font generation, or a regression from a known-good version, stay in `/hunt`.
 
 ## Scope Blast Mode
 
-Activate after fixing a root-cause pattern, before declaring the bug done; also when the user says "举一反三", "举一反三심층看看", or "其他地方有没有同样问题". The same shape often hides in N other places; one local fix that ignores the blast leaves N - 1 bugs in the tree.
+Activate after fixing a root-cause pattern, before declaring the bug done; also when the user says "", "심층", or "". The same shape often hides in N other places; one local fix that ignores the blast leaves N - 1 bugs in the tree.
 
 Extract the pattern signature (the specific function, regex, API call, CSS selector, lock acquisition, validation skip, or input boundary that produced the bug) and `grep -rn` it across the repo, excluding generated dirs, build output, and vendored deps; for class-of-bug patterns ("any handler missing the lock"), grep the surrounding shape, not just the literal text. For every match, answer in writing: same bug / safe to leave (why) / unsure (ask the user). Do not silently skip a match, and do not claim "fixed" until the blast report is in the Output block. Unrelated bugs the sweep surfaces get listed, not fixed in this PR, unless the user agrees.
 
@@ -95,7 +92,7 @@ Use this ladder before claiming a bug is fixed:
 
 Compile-only is not enough for UI, native-app, visual, rendering, or generated-artifact bugs. If the runtime check is impossible in the environment, say why and hand off the exact screen, command, or artifact to verify.
 
-For recurring classes of failures, load `references/failure-patterns.md` before adding a second fix.
+For recurring classes of failures,  before adding a second fix.
 
 ## Native App Freeze Mode
 
@@ -119,7 +116,7 @@ Compile-only and source-only checks are insufficient for this mode. The outcome 
 
 ## Targeted Logging
 
-Every log is a yes/no question: "if this prints X before Y, hypothesis A survives; otherwise A is dead." A log that cannot rule a hypothesis in or out is noise. Remove temporary logs before finishing; gate persistent diagnostics behind the project's debug flag. If adding a log changes the behavior, that is itself evidence of a timing, lifecycle, or concurrency problem. Full playbook: `references/logging-techniques.md`.
+Every log is a yes/no question: "if this prints X before Y, hypothesis A survives; otherwise A is dead." A log that cannot rule a hypothesis in or out is noise. Remove temporary logs before finishing; gate persistent diagnostics behind the project's debug flag. If adding a log changes the behavior, that is itself evidence of a timing, lifecycle, or concurrency problem. Full playbook: the skill reference guidelines.
 
 ## Gotchas
 
@@ -144,11 +141,11 @@ Every log is a yes/no question: "if this prints X before Y, hypothesis A survive
 
 Activate when: "PDF looks wrong", "page break issue", "font not rendering", broken PDF output, or print layout wrong.
 
-Load `references/rendering-debug.md` for the full diagnosis checklist (WeasyPrint quirks, font loading, page overflow, browser print CSS). Static analysis first, then reproduce if needed.
+Load the skill reference guidelines for the full diagnosis checklist (WeasyPrint quirks, font loading, page overflow, browser print CSS). Static analysis first, then reproduce if needed.
 
 ## IME / Unicode Issues
 
-For input method, character rendering, or text encoding bugs (IME state, cursor drift, emoji splitting, composition events), check `references/ime-unicode.md` first before forming a hypothesis.
+For input method, character rendering, or text encoding bugs (IME state, cursor drift, emoji splitting, composition events), check the skill reference guidelines first before forming a hypothesis.
 
 ## Output
 

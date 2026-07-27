@@ -1,8 +1,6 @@
 ---
 name: write
 description: "Rewrites and polishes prose in Chinese or English, removes AI-like wording, and reviews product localization copy while preserving intent for drafts, docs, release notes, launch copy, and social posts. Use when users ask in any language to draft, rewrite, proofread, localize, polish release notes, remove AI-like wording, or prepare launch and social copy. Not for code comments, commit messages, or inline docs."
-when_to_use: "帮我写, 改稿, 润色, 去AI味, 写一段, 审稿, 文档review, 本地化文案, 多语言文案, i18n copy, localization copy, check this document, 推特, twitter, X推文, tweet, social post, 连贯性, 段落连贯, draft, edit text, proofread, sound natural, polish, rewrite"
-dispatch_intent: "Writing, editing prose, polish, release notes, launch/social copy, remove AI tone"
 ---
 
 # Write: Cut the AI Taste
@@ -11,7 +9,6 @@ Prefix your first line with 🥷 inline, not as its own paragraph.
 
 **Always respond in Korean (한국어).**
 
-**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.
 
 Strip AI patterns from prose and rewrite it to sound human. Do not improve vocabulary; remove the performance of improvement.
 
@@ -38,17 +35,17 @@ When distilling a new lesson into this skill, fold it into an existing principle
 1. **Text present?** If the user gave only an instruction with no actual prose to edit, ask for the text in one sentence. Do not proceed.
 2. **Audience locked?** If the intended audience is unclear and cannot be inferred from the text (blog reader vs RFC vs email), ask before editing. Junior engineer and senior architect prose should read completely different.
 3. **Language detected from the text being edited**, not the user's command:
-   - Contains Chinese characters + release notes or social post mode → load `references/write-zh-release-notes.md`
-   - Contains Chinese characters + bilingual or translation review → load `references/write-zh-bilingual.md`
-   - Product/site/app localization review across multiple locales → load `references/write-product-localization.md`; also load `references/write-zh-bilingual.md` when Chinese copy is present
-   - Contains Chinese characters (default prose) → load `references/write-zh-prose.md` (quick rules); load `references/write-zh.md` for the full AI-taste pattern catalog
-   - Otherwise → load `references/write-en.md`
+   - Contains Chinese characters + release notes or social post mode → 
+   - Contains Chinese characters + bilingual or translation review → 
+   - Product/site/app localization review across multiple locales → ; also  when Chinese copy is present
+   - Contains Chinese characters (default prose) →  (quick rules);  for the full AI-taste pattern catalog
+   - Otherwise → 
 
 No summary, no commentary, no explanation of changes unless explicitly asked.
 
 ## Durable Context Preflight
 
-See [references/durable-context.md](references/durable-context.md) for when to read durable context, the read-order budget, and the memory-type mapping.
+ for when to read durable context, the read-order budget, and the memory-type mapping.
 
 For `/write`: the supplied text and current release state override memory. Durable preferences can set brevity, tone, and social-post shape; they do not override the hard rule to edit in place, keep meaning intact, and avoid change lists unless the user explicitly asks.
 
@@ -67,10 +64,10 @@ For `/write`: the supplied text and current release state override memory. Durab
 Before returning any produced text (a rewrite, or generated release / reply / social copy), resolve the checker across install layouts and run it:
 
 ```bash
-GATE="${CLAUDE_SKILL_DIR:+$CLAUDE_SKILL_DIR/scripts/check-punctuation.sh}"
-[ -f "${GATE:-}" ] || GATE="${CLAUDE_SKILL_DIR:+$CLAUDE_SKILL_DIR/skills/write/scripts/check-punctuation.sh}"
-[ -f "${GATE:-}" ] || GATE="./skills/write/scripts/check-punctuation.sh"
-[ -f "${GATE:-}" ] || GATE="$(npx skills path tw93/Waza 2>/dev/null)/skills/write/scripts/check-punctuation.sh"
+GATE="${CLAUDE_SKILL_DIR:+$CLAUDE_SKILL_DIR/project scripts}"
+[ -f "${GATE:-}" ] || GATE="${CLAUDE_SKILL_DIR:+$CLAUDE_SKILL_DIR/skills/write/project scripts}"
+[ -f "${GATE:-}" ] || GATE="./skills/write/project scripts"
+[ -f "${GATE:-}" ] || GATE="$(npx skills path tw93/Waza 2>/dev/null)/skills/write/project scripts"
 [ -f "${GATE:-}" ] || { echo "punctuation gate not found; reinstall Waza or set CLAUDE_SKILL_DIR" >&2; exit 1; }
 bash "$GATE" --lang <zh|en|ja|auto> <file>   # or pipe text via stdin
 ```
@@ -88,23 +85,23 @@ In long-form, the dominant problem is usually structural: the same checklist rep
 Workflow:
 
 1. **Map first, read-only.** Before editing anything, read the whole article and list every `##` section, table, list, and image. Flag three structural problems: cross-section repetition (same checklist / judgment list / core claim in 2+ sections), table re-reading (a section whose prose walks the rows of the table above it), and whole redundant sections or paragraphs.
-2. **Propose cuts as change-points.** Show before to after for each structural cut or merge and let the user pick the subset. Never delete a whole section or paragraph silently; confirm first, since it may hold a fact found nowhere else (see `references/write-zh.md` 删段之前先确认信息量).
-3. **Then line-level de-AI**, section by section, per `references/write-zh.md`.
+2. **Propose cuts as change-points.** Show before to after for each structural cut or merge and let the user pick the subset. Never delete a whole section or paragraph silently; confirm first, since it may hold a fact found nowhere else (see the skill reference guidelines ).
+3. **Then line-level de-AI**, section by section, per the skill reference guidelines.
 4. **Output is change-points, not a blob.** Show what changed so the user can review and keep their own hand-edits. Only return fully rewritten text when the user says 직접 수정 / just rewrite; when you do return a full rewrite, run the Punctuation Gate on it first.
 
-Do not single-pass rewrite a 40k-character article: it silently overwrites the author's hand-tuned phrasing and cannot be reviewed as a diff. See `references/write-zh.md` 结构级重复与表格复读（长文专项）for the matching content rules.
+Do not single-pass rewrite a 40k-character article: it silently overwrites the author's hand-tuned phrasing and cannot be reviewed as a diff. See the skill reference guidelines （）for the matching content rules.
 
 ## Bilingual Review Mode
 
 Activate when: mixed Chinese/English, "Chinese copywriting", "bilingual consistency", "release notes"
 
-Load `references/write-zh-bilingual.md`. Character-level spacing and punctuation belong to the Punctuation Gate script; this mode owns the judgment half: terminology consistency across all instances, unexplained English left untranslated in Chinese documents, and EN/CN pairs that drift in meaning (mark translation loss instead of silently rewriting one side).
+Load the skill reference guidelines. Character-level spacing and punctuation belong to the Punctuation Gate script; this mode owns the judgment half: terminology consistency across all instances, unexplained English left untranslated in Chinese documents, and EN/CN pairs that drift in meaning (mark translation loss instead of silently rewriting one side).
 
 ## Product Localization Review Mode
 
-Activate when: "本地化文案", "多语言文案", "localization copy", "i18n copy", product/site/app strings, release feed copy, runtime catalog, or a user asks whether localized copy feels native.
+Activate when: "", "", "localization copy", "i18n copy", product/site/app strings, release feed copy, runtime catalog, or a user asks whether localized copy feels native.
 
-Load `references/write-product-localization.md`. If Chinese is one of the locales, also load `references/write-zh-bilingual.md`.
+Load the skill reference guidelines. If Chinese is one of the locales, also .
 
 Default workflow:
 
@@ -133,7 +130,7 @@ Before drafting, gather style references:
 
 ### Release Notes Content Rules
 
-- **Group by user-perceivable feature**, not by internal taxonomy. "Polish", "细节打磨", "Misc improvements", "Chores" are not categories users can act on. Group by product surface (Clean / Uninstall / Status / Settings) or by user-visible verb (Faster startup / New keyboard shortcut / Fixed crash on M3).
+- **Group by user-perceivable feature**, not by internal taxonomy. "Polish", "", "Misc improvements", "Chores" are not categories users can act on. Group by product surface (Clean / Uninstall / Status / Settings) or by user-visible verb (Faster startup / New keyboard shortcut / Fixed crash on M3).
 - **Extract from `git log <last-tag>..HEAD`** rather than from memory. Read every `feat:` and `fix:` commit; do not omit small items just because they look minor in commit form (iOS wrapper support, Dock cleanup, AV-vendor protection boundary are not "minor" from a user point of view).
 - **One sentence per item, naming the user-visible change**, not the implementation. "Use `CKDownloadQueue` observer for App Store updates" is not a release note; "App Store updates now run inside the app instead of opening App Store" is.
 - **Bilingual structure**: when the project ships bilingual release notes, put the English block and the Chinese block as two parallel sections inside the same release item; do not interleave per bullet. For HTML-capable update-feed CDATA, separate language blocks with headings so the rendered update window does not collapse them together.
@@ -141,16 +138,16 @@ Before drafting, gather style references:
 
 ## Public Reply Mode (GitHub issue / PR)
 
-Activate when: "回复 issue", "reply to PR", "comment on #N", "回 issue", or the user asks for the text of a GitHub issue / PR comment.
+Activate when: " issue", "reply to PR", "comment on #N", " issue", or the user asks for the text of a GitHub issue / PR comment.
 
 Four hard rules for the reply body:
 
-1. **Open with `@<reporter>` + one thanks line.** Match the reporter's language (Chinese → "感谢反馈" / English → "thanks for the detailed report"). No exclamation mark. No emoji. No "🙏".
+1. **Open with `@<reporter>` + one thanks line.** Match the reporter's language (Chinese → "" / English → "thanks for the detailed report"). No exclamation mark. No emoji. No "🙏".
 2. **Then state the cause in one sentence, the impact in one sentence.** No multi-paragraph background, no internal symbol names, no walk-through of the fix.
 3. **Then state the ship state**, exactly one of: already shipped in v<X.Y.Z>, fixed on `main` and going out in the next release, planned for v<X.Y.Z>, not planned (with one-line reason and an alternative path). Every sentence must be true at the moment of posting: no "already shipped" without release evidence in the current turn, no "landed on main" while the change sits uncommitted, no implied verification (built a branch, ran an artifact) that did not happen.
 4. **Two paragraphs maximum**, separated by one blank line. No bullet lists, no section headers, no code blocks except a one-line command when actually needed.
 
-The reply is the final user-facing text, not an agent log. Do not write "刚才我判断错了", "前面回复有误", "I re-read it and changed the comment", or any meta narration about your own process. If editing an existing maintainer comment, replace it with the clean final wording as if it were the only comment the user will read.
+The reply is the final user-facing text, not an agent log. Do not write "", "", "I re-read it and changed the comment", or any meta narration about your own process. If editing an existing maintainer comment, replace it with the clean final wording as if it were the only comment the user will read.
 
 Before posting, re-read the live issue / PR with `gh issue view <num>` or `gh pr view <num>`. Do not reply from memory; titles, states, and author languages change between sessions.
 
@@ -162,7 +159,7 @@ Closing rule: when closing as `completed`, the comment must independently explai
 
 ## Document Review Mode
 
-Activate when: PDF, document, white paper, "review this document", "check this document", "审稿"
+Activate when: PDF, document, white paper, "review this document", "check this document", ""
 
 Review checklist:
 - **Privacy scan**: Detect PII (names, companies, employment dates, salary hints, location details). Hard stop if any text implies job seeking, competitor info, or personal data leakage.
@@ -175,7 +172,7 @@ Output format: same as prose rewrite, but append `privacy: clear / N issues foun
 
 ## Paragraph Coherence Mode
 
-Activate when: "连贯性", "段落连贯", "可读性", "coherence", "flow check", "段落顺不顺"
+Activate when: "", "", "", "coherence", "flow check", ""
 
 Do not rewrite. Instead, work through each paragraph in sequence:
 1. Flag transitions that abruptly shift topic without a signal.
@@ -187,16 +184,16 @@ Output: a numbered list of issues, each with the paragraph location and a one-li
 
 ## Tweet / Social Post Mode
 
-Activate when: "推特", "twitter", "X推文", "tweet", "social post", "折叠长度", "长文推特", "发文"
+Activate when: "", "twitter", "X", "tweet", "social post", "", "", ""
 
 Apply the five announcement rules for product-engineer projects when the project context or prior artifact shows this style:
 1. **Lead with community**: open with the social anchor (star count, user thanks, whose feedback drove the fix). Changes follow, not lead.
 2. **Highlights over completeness**: pick 2 to 4 of the most interesting changes. Dropping whole items is fine.
-3. **UX framing**: phrase each point as "你用它的时候..." or "有一种...的感觉", not "这个工具做了...".
+3. **UX framing**: phrase each point as "..." or "...", not "...".
 4. **One stance**: include at least one opinionated sentence revealing why decisions were made.
 5. **Native Chinese rhythm**: use idiomatic phrasing. Avoid translation-sounding terms.
 
-Close casually with an invitation, not a CTA. End with one short sentence inviting readers to try, not "立即升级".
+Close casually with an invitation, not a CTA. End with one short sentence inviting readers to try, not "".
 
 For other engineering projects or English posts, apply the same structure (community lead, highlights, UX framing, one stance, casual close) adapted to the project's voice.
 
@@ -207,7 +204,7 @@ For other engineering projects or English posts, apply the same structure (commu
 | Reorganized headings without being asked | Do not restructure; edit in place unless structure changes are explicitly requested |
 | Appended a "changes made" list after the rewrite | Output is the edited text only. No changelog, no commentary. |
 | Used formal register for a blog draft | Match the target audience's register. Blog is conversational, not academic. |
-| Applied Chinese/English spacing rules to a pure-English text | Bilingual spacing rules (半角/全角) only apply when the text mixes Chinese and English |
+| Applied Chinese/English spacing rules to a pure-English text | Bilingual spacing rules (/) only apply when the text mixes Chinese and English |
 | Polished the user's voice into generic launch copy | Preserve the author's cadence and stance. Use real product artifacts to sharpen facts, not to replace the voice. |
 | Drafted release or social copy from memory or a handoff | Read the current release page, changelog, issue/PR, runnable artifact, product page, screenshot, or supplied source before making factual claims. |
 | Wrote launch copy in one pass without checking the live screenshots | Iterate: draft, compare against the real product screenshot or page, tighten wording to match what ships, repeat until copy and artifact agree |

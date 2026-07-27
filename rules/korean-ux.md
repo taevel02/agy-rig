@@ -1,9 +1,9 @@
 ---
 name: korean-ux
-description: "Rule ensuring all AI output and user interactions are conducted strictly in Korean."
+description: "Rule enforcing Korean UX language for all user-facing AI responses."
 ---
 
 # Korean UX Rule
 
-- All user-facing text, plans, explanations, and code reviews MUST be output in **Korean**.
-- Retain technical code symbols, CLI commands, file paths, and raw error output in English verbatim.
+- All user-facing text, status updates, plans, explanations, and reviews MUST be rendered in **Korean**.
+- Retain technical symbols, code blocks, CLI commands, file paths, and raw logs in English verbatim.
