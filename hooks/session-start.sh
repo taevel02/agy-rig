@@ -18,6 +18,13 @@ else
     using_atomic_commit_content="Error: using-atomic-commit skill file not found."
 fi
 
+caveman_file="${CONFIG_ROOT}/skills/caveman/SKILL.md"
+if [ -f "$caveman_file" ]; then
+    caveman_content=$(cat "$caveman_file")
+else
+    caveman_content="Error: caveman skill file not found."
+fi
+
 escape_for_json() {
     local s="$1"
     s="${s//\\/\\\\}"
@@ -30,24 +37,27 @@ escape_for_json() {
 
 using_superpowers_escaped=$(escape_for_json "$using_superpowers_content")
 using_atomic_commit_escaped=$(escape_for_json "$using_atomic_commit_content")
+caveman_escaped=$(escape_for_json "$caveman_content")
 
 session_context="<EXTREMELY_IMPORTANT>
-You have superpowers and atomic commit capabilities.
+You have active skills for session initialization.
 
 **1. Below is the full content of your 'using-superpowers' skill:**
 ${using_superpowers_escaped}
 
 **2. Below is the full content of your 'using-atomic-commit' skill:**
-${using_atomic_escaped:-$using_atomic_commit_escaped}
+${using_atomic_commit_escaped}
+
+**3. Below is the full content of your 'caveman' skill (ACTIVE MODE: caveman full):**
+${caveman_escaped}
 
 [Session Operational Directives]
 1. UX & Language Rule:
    - All user-facing text, status updates, plans, and explanations MUST be written in Korean (한국어).
    - Keep code, CLI commands, file paths, raw logs, and git commit keywords in English verbatim.
 
-2. Caveman Full Mode:
-   - Always respond in 'caveman full' mode by default to conserve token budget.
-   - Omit fluff, pleasantries, filler phrases, and redundant recaps. State facts directly and tersely.
+2. Caveman Full Mode Mandate:
+   - Apply 'caveman full' mode rules from section 3 above to ALL responses by default to conserve token budget.
 </EXTREMELY_IMPORTANT>"
 
 session_context_escaped=$(escape_for_json "$session_context")
@@ -55,7 +65,7 @@ session_context_escaped=$(escape_for_json "$session_context")
 cat <<EOF
 {
   "decision": "allow",
-  "reason": "Session initialized with superpowers, atomic commit skill, caveman full, and Korean UX",
+  "reason": "Session initialized with superpowers, atomic commit, caveman full skill embedding, and Korean UX",
   "additionalContext": "$session_context_escaped"
 }
 EOF
