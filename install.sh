@@ -69,22 +69,29 @@ make_symlink "${SCRIPT_DIR}/hooks/session-start.sh" "${TARGET_DIR}/hooks/session
 # 3. Rules
 make_symlink "${SCRIPT_DIR}/rules/korean-ux.md" "${TARGET_DIR}/rules/korean-ux.md"
 
-# 4. Plugins (Upstream Waza)
+# 4. Plugins
 if [ -d "${SCRIPT_DIR}/plugins/waza" ]; then
     make_symlink "${SCRIPT_DIR}/plugins/waza" "${TARGET_DIR}/plugins/waza"
 fi
 
-# 5. Built-in Skills
-if [ -d "${SCRIPT_DIR}/skills/simplify" ]; then
-    make_symlink "${SCRIPT_DIR}/skills/simplify" "${TARGET_DIR}/skills/simplify"
+# 5. Local Skills (skills/)
+if [ -d "${SCRIPT_DIR}/skills" ]; then
+    for skill_path in "${SCRIPT_DIR}/skills/"*; do
+        if [ -d "${skill_path}" ]; then
+            skill_name="$(basename "${skill_path}")"
+            make_symlink "${skill_path}" "${TARGET_DIR}/skills/${skill_name}"
+        fi
+    done
 fi
 
-if [ -d "${SCRIPT_DIR}/skills/caveman" ]; then
-    make_symlink "${SCRIPT_DIR}/skills/caveman" "${TARGET_DIR}/skills/caveman"
-fi
-
-if [ -d "${SCRIPT_DIR}/skills/using-superpowers" ]; then
-    make_symlink "${SCRIPT_DIR}/skills/using-superpowers" "${TARGET_DIR}/skills/using-superpowers"
+# 6. Waza Skills (plugins/waza/skills/)
+if [ -d "${SCRIPT_DIR}/plugins/waza/skills" ]; then
+    for skill_path in "${SCRIPT_DIR}/plugins/waza/skills/"*; do
+        if [ -d "${skill_path}" ]; then
+            skill_name="$(basename "${skill_path}")"
+            make_symlink "${skill_path}" "${TARGET_DIR}/skills/${skill_name}"
+        fi
+    done
 fi
 
 echo ""
