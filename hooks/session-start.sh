@@ -40,7 +40,7 @@ using_atomic_commit_escaped=$(escape_for_json "$using_atomic_commit_content")
 caveman_escaped=$(escape_for_json "$caveman_content")
 
 session_context="<EXTREMELY_IMPORTANT>
-You have active skills for session initialization.
+You have active skills initialized for this session.
 
 **1. Below is the full content of your 'using-superpowers' skill:**
 ${using_superpowers_escaped}
@@ -51,13 +51,8 @@ ${using_atomic_commit_escaped}
 **3. Below is the full content of your 'caveman' skill (ACTIVE MODE: caveman full):**
 ${caveman_escaped}
 
-[Session Operational Directives]
-1. UX & Language Rule:
-   - All user-facing text, status updates, plans, and explanations MUST be written in Korean (한국어).
-   - Keep code, CLI commands, file paths, raw logs, and git commit keywords in English verbatim.
-
-2. Caveman Full Mode Mandate:
-   - Apply 'caveman full' mode rules from section 3 above to ALL responses by default to conserve token budget.
+[Active Mode Mandate]
+By default, apply the 'caveman full' mode rules from section 3 above to all responses to conserve token budget.
 </EXTREMELY_IMPORTANT>"
 
 session_context_escaped=$(escape_for_json "$session_context")
@@ -65,7 +60,7 @@ session_context_escaped=$(escape_for_json "$session_context")
 cat <<EOF
 {
   "decision": "allow",
-  "reason": "Session initialized with superpowers, atomic commit, caveman full skill embedding, and Korean UX",
+  "reason": "Session initialized with superpowers, atomic commit, and caveman full skill embeddings",
   "additionalContext": "$session_context_escaped"
 }
 EOF
