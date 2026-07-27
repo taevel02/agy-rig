@@ -21,26 +21,33 @@ This is not negotiable. You cannot rationalize your way out of this.
 
 Then announce "Using [skill] to [purpose]" and follow the skill exactly. If it has a checklist, create a todo per item.
 
-## Available Skills & Mapping
+## Available Skills & Intent Mapping
 
 Process skills set the approach; execution skills carry out specific tasks. Always invoke matching skills from your environment:
 
-- **Plan / Architecture / Pre-build design**: `/waza:think`
-- **Code review / Release gates / Audit**: `/waza:check`
-- **Root cause diagnosis / Bug fix / Regression**: `/waza:hunt`
-- **UI/UX design / Visual polish / Styling**: `/waza:ui`
-- **Writing prose / Release notes / Copywriting**: `/waza:write`
-- **Research / Synthesis / Material compilation**: `/waza:learn`
-- **Fetching URLs / Reading PDFs**: `/waza:read`
-- **Engineering health audit / Config check**: `/waza:health`
-- **Code refactoring for clarity & simplicity**: `simplify`
-- **Terse token-saving response mode**: `caveman`
+- **Plan / Architecture / Feature Design**: `/waza:think`
+- **Code Review / PR / Release Gate / Audit**: `/waza:check`
+- **Root Cause Diagnosis / Bug Fix / Regression**: `/waza:hunt`
+- **UI/UX Design / Visual Polish / Component Styling**: `/waza:ui`
+- **Writing Prose / Documentation / Release Notes / Social Copy**: `/waza:write`
+- **Deep Research / Synthesis / Material Compilation**: `/waza:learn`
+- **Reading Web URLs / Extracting PDFs**: `/waza:read`
+- **Engineering Health Audit / Config Check**: `/waza:health`
+- **Code Refactoring for Readability & Simplicity**: `simplify`
+- **Terse Token-Saving Response Mode**: `caveman`
 
-## Red Flags
+## Red Flags (Anti-Rationalization Gate)
 
 | Thought (The Rationalization) | Reality (The Rule) |
 |---|---|
-| "This is just a simple question" | Questions are tasks. Check for skills. |
-| "I need more context first" | Skill check comes BEFORE clarifying questions. |
-| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first. |
-| "I can check git/files quickly" | Files lack conversation context. Check for skills. |
+| "This is just a simple question or quick lookup" | Questions are tasks. Check for skills BEFORE answering. |
+| "I need to ask clarifying questions before invoking skills" | Skill check MUST occur BEFORE asking clarifying questions. |
+| "Let me explore the codebase or view files first" | Skills specify HOW to explore context safely. Invoke skill first. |
+| "I can jump straight to writing code without a plan" | Architectural or feature builds require `/waza:think` planning first. |
+| "The bug fix is obvious, no need for diagnostic hunting" | Failing tests/bugs require `/waza:hunt` root-cause analysis before editing. |
+| "I will do a quick manual code review" | Code review, diff inspection, and release gates require `/waza:check`. |
+| "I will write long polite intro paragraphs" | `caveman full` mode is default. Omit filler; state facts tersely in Korean. |
+
+<CRITICAL-DIRECTIVE>
+If any thought in the Red Flags table enters your reasoning process, STOP IMMEDIATELY. Re-evaluate your approach, invoke the appropriate skill, and follow its protocol.
+</CRITICAL-DIRECTIVE>
