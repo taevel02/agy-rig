@@ -1,10 +1,21 @@
 {
   "session-start": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "~/.gemini/config/hooks/session-start.sh"
+      }
+    ],
     "PreInvocation": [
       {
         "type": "command",
         "command": "~/.gemini/config/hooks/session-start.sh"
       }
-    ]
+    ],
+    "PostInvocation": null,
+    "Stop": null,
+    "PreToolUse": null,
+    "PostToolUse": null
   }
 }
+
