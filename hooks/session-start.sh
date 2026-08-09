@@ -4,56 +4,63 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONFIG_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-read_skill_file() {
-    local file="$1"
-    local name="$2"
-    if [ -f "$file" ]; then
-        cat "$file"
+# Read stdin if available
+INPUT_JSON="{}"
+if [ ! -t 0 ]; then
+    RAW_INPUT="$(cat)"
+    if [ -n "${RAW_INPUT// }" ]; then
+        INPUT_JSON="$RAW_INPUT"
+    fi
+fi
+
+INVOCATION_NUM=$(echo "$INPUT_JSON" | jq -r '.invocationNum // 1' 2>/dev/null || echo "1")
+
+read_file() {
+    local rel_path="$1"
+    local full_path="${CONFIG_ROOT}/${rel_path}"
+    if [ -f "$full_path" ]; then
+        cat "$full_path"
     else
-        echo "Error: ${name} skill file not found."
+        echo ""
     fi
 }
 
-escape_for_json() {
-    local s="$1"
-    s="${s//\\/\\\\}"
-    s="${s//\"/\\\"}"
-    s="${s//$'\n'/\\n}"
-    s="${s//$'\r'/\\r}"
-    s="${s//$'\t'/\\t}"
-    printf '%s' "$s"
-}
+if [ "$INVOCATION_NUM" -le 1 ]; then
+    SUPERPOWERS=$(read_file "skills/using-superpowers/SKILL.md")
+    ATOMIC_COMMIT=$(read_file "skills/using-atomic-commit/SKILL.md")
+    CAVEMAN=$(read_file "skills/caveman/SKILL.md")
 
-using_superpowers_content=$(read_skill_file "${CONFIG_ROOT}/skills/using-superpowers/SKILL.md" "using-superpowers")
-using_atomic_commit_content=$(read_skill_file "${CONFIG_ROOT}/skills/using-atomic-commit/SKILL.md" "using-atomic-commit")
-caveman_content=$(read_skill_file "${CONFIG_ROOT}/skills/caveman/SKILL.md" "caveman")
+    PROMPT=$(cat <<EOF
+<EXTREMELY_IMPORTANT>
+[ACTIVE SESSION MANDATE]
+1. Korean UX Rule: All user-facing text, explanations, and plans MUST be rendered in Korean (keep code/commands/symbols in English).
+2. Git Worktree & Submodule Awareness: Always maintain clean worktrees and handle submodules atomically.
+3. Atomic Commits: After completing verified units of work, execute 1-line Conventional Commits immediately.
+4. Caveman Mode (Full): Apply terse, token-saving responses.
 
-using_superpowers_escaped=$(escape_for_json "$using_superpowers_content")
-using_atomic_commit_escaped=$(escape_for_json "$using_atomic_commit_content")
-caveman_escaped=$(escape_for_json "$caveman_content")
+**Active Skill Embeddings:**
 
-session_context="<EXTREMELY_IMPORTANT>
-You have active skills initialized for this session.
+### 1. using-superpowers
+${SUPERPOWERS}
 
-**1. Below is the full content of your 'using-superpowers' skill:**
-${using_superpowers_escaped}
+### 2. using-atomic-commit
+${ATOMIC_COMMIT}
 
-**2. Below is the full content of your 'using-atomic-commit' skill:**
-${using_atomic_commit_escaped}
-
-**3. Below is the full content of your 'caveman' skill (ACTIVE MODE: caveman full):**
-${caveman_escaped}
-
-[Active Mode Mandate]
-By default, apply the 'caveman full' mode rules from section 3 above to all responses to conserve token budget.
-</EXTREMELY_IMPORTANT>"
-
-session_context_escaped=$(escape_for_json "$session_context")
-
-cat <<EOF
-{
-  "decision": "allow",
-  "reason": "Session initialized with superpowers, atomic commit, and caveman full skill embeddings",
-  "additionalContext": "$session_context_escaped"
-}
+### 3. caveman (ACTIVE MODE: caveman full)
+${CAVEMAN}
+</EXTREMELY_IMPORTANT>
 EOF
+)
+else
+    PROMPT=$(cat <<EOF
+<EXTREMELY_IMPORTANT>
+[ACTIVE SESSION REMINDER]
+- Korean UX: Answer in Korean (technical terms in English).
+- Atomic Commits: Commit immediately upon completing verified units of work.
+- Caveman Mode: Keep responses concise and token-efficient.
+</EXTREMELY_IMPORTANT>
+EOF
+)
+fi
+
+jq -n --arg msg "$PROMPT" '{injectSteps: [{ephemeralMessage: $msg}]}'

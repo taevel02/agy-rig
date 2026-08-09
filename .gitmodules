@@ -1,3 +1,6 @@
 [submodule "plugins/waza"]
 	path = plugins/waza
 	url = https://github.com/tw93/Waza.git
+[submodule "plugins/marketingskills"]
+	path = plugins/marketingskills
+	url = https://github.com/coreyhaines31/marketingskills.git

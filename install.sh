@@ -42,15 +42,20 @@ if [ ! -f "${SCRIPT_DIR}/.env" ] && [ -f "${SCRIPT_DIR}/.env.example" ]; then
     fi
 fi
 
-# Auto-update Waza plugin
-if [ -d "${SCRIPT_DIR}/plugins/waza/.git" ]; then
-    if [ "$DRY_RUN" = true ]; then
-        echo -e "${DIM}[INFO] Would update Waza repository via git pull${NC}\n"
-    else
-        echo -e "${BLUE}[UPDATE] Pulling Waza updates...${NC}"
-        git -C "${SCRIPT_DIR}/plugins/waza" pull --quiet || echo -e "${YELLOW}[WARN] Failed Waza git pull${NC}"
-        echo ""
-    fi
+# Auto-update plugin submodules
+if [ -d "${SCRIPT_DIR}/plugins" ]; then
+    for plugin_dir in "${SCRIPT_DIR}/plugins/"*; do
+        if [ -d "${plugin_dir}/.git" ]; then
+            plugin_name="$(basename "${plugin_dir}")"
+            if [ "$DRY_RUN" = true ]; then
+                echo -e "${DIM}[INFO] Would update plugin ${plugin_name} via git pull${NC}\n"
+            else
+                echo -e "${BLUE}[UPDATE] Pulling ${plugin_name} updates...${NC}"
+                git -C "${plugin_dir}" pull --quiet || echo -e "${YELLOW}[WARN] Failed ${plugin_name} git pull${NC}"
+                echo ""
+            fi
+        fi
+    done
 fi
 
 make_symlink() {
@@ -86,9 +91,18 @@ make_symlink "${SCRIPT_DIR}/hooks/session-start.sh" "${TARGET_DIR}/hooks/session
 make_symlink "${SCRIPT_DIR}/rules/korean-ux.md" "${TARGET_DIR}/rules/korean-ux.md"
 echo ""
 
-# 3. Skills (Local & Waza Upstream)
+# 3. Skills (Local & Plugin Upstreams)
 echo -e "${BOLD}Skills${NC}"
-for skill_dir in "${SCRIPT_DIR}/skills" "${SCRIPT_DIR}/plugins/waza/skills"; do
+SKILL_DIRS=("${SCRIPT_DIR}/skills")
+if [ -d "${SCRIPT_DIR}/plugins" ]; then
+    for plugin_skills in "${SCRIPT_DIR}/plugins/"*/skills; do
+        if [ -d "${plugin_skills}" ]; then
+            SKILL_DIRS+=("${plugin_skills}")
+        fi
+    done
+fi
+
+for skill_dir in "${SKILL_DIRS[@]}"; do
     if [ -d "${skill_dir}" ]; then
         for skill_path in "${skill_dir}/"*; do
             if [ -d "${skill_path}" ]; then
@@ -97,6 +111,7 @@ for skill_dir in "${SCRIPT_DIR}/skills" "${SCRIPT_DIR}/plugins/waza/skills"; do
         done
     fi
 done
+
 
 echo ""
 if [ "$DRY_RUN" = true ]; then
