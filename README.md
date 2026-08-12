@@ -66,7 +66,10 @@ Apply symlinks to `~/.gemini/config/`:
 
 - **[tw93/Waza](https://github.com/tw93/Waza)**: Upstream repository for core engineering workflow skills (`/think`, `/check`, `/hunt`, `/ui`, `/write`, `/learn`, `/read`, `/health`).
 - **[coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills)**: Upstream repository for growth and marketing skills.
-- **[emilkowalski/skills](https://github.com/emilkowalski/skills)**: Source reference for `/using-superpowers`, `/writing-for-agents`, `/caveman`, and `/apple-design` skills.
+- **[obra/superpowers](https://github.com/obra/superpowers)**: Source reference for `/using-superpowers`.
+- **[juliusbrussee/caveman](https://github.com/juliusbrussee/caveman)**: Source reference for `/caveman`.
+- **[mattpocock/skills](https://github.com/mattpocock/skills)**: Source reference for `/writing-for-agents`.
+- **[emilkowalski/skills](https://github.com/emilkowalski/skills)**: Source reference for `/apple-design`.
 
 ---
 
