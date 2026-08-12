@@ -53,10 +53,20 @@ Apply symlinks to `~/.gemini/config/`:
 | | `/read` | Extracting web URLs & reading PDF documents |
 | | `/health` | Engineering health audit & config drift check |
 | **Marketing Skills** | MarketingSkills (50+) | Comprehensive growth & marketing skills (copywriting, seo-audit, launch, ads, cro, pricing, etc.) |
-| **Local Meta Skills** | `/caveman` | Switch communication intensity (`lite`, `full`, `ultra`) |
+| **Local / Built-in Skills** | `/caveman` | Switch communication intensity (`lite`, `full`, `ultra`) |
 | | `/simplify` | Refactor code for clarity without altering behavior |
 | | `/using-superpowers` | Meta-skill enforcing skill invocation before action |
 | | `/using-atomic-commit` | Enforces 1-line atomic commits conforming to Conventional Commits v1.0.0 |
+| | `/writing-for-agents` | Guidelines for writing agent-consumable documents & skills |
+| | `/apple-design` | Apple's fluid interface design & motion principles for web |
+
+---
+
+## References & Acknowledgements
+
+- **[tw93/Waza](https://github.com/tw93/Waza)**: Upstream repository for core engineering workflow skills (`/think`, `/check`, `/hunt`, `/ui`, `/write`, `/learn`, `/read`, `/health`).
+- **[coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills)**: Upstream repository for growth and marketing skills.
+- **[emilkowalski/skills](https://github.com/emilkowalski/skills)**: Source reference for `/using-superpowers`, `/writing-for-agents`, `/caveman`, and `/apple-design` skills.
 
 ---
 
