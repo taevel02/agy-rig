@@ -1,0 +1,82 @@
+name: Check Submodule Releases
+
+on:
+  schedule:
+    # Run every Monday at 00:00 UTC (주 1회 실행)
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-submodules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Check and update submodules to latest release tags
+        id: update_submodules
+        run: |
+          CHANGES=""
+          UPDATED_COUNT=0
+
+          for sub in plugins/*; do
+            [ -d "$sub/.git" ] || [ -f "$sub/.git" ] || continue
+            name=$(basename "$sub")
+            git -C "$sub" fetch --tags --quiet
+            latest_tag=$(git -C "$sub" tag -l 'v*' --sort=-v:refname | head -n 1)
+            if [ -z "$latest_tag" ]; then
+              latest_tag=$(git -C "$sub" tag -l --sort=-v:refname | head -n 1)
+            fi
+
+            if [ -n "$latest_tag" ]; then
+              current_commit=$(git -C "$sub" rev-parse HEAD)
+              target_commit=$(git -C "$sub" rev-parse "$latest_tag^{commit}")
+
+              if [ "$current_commit" != "$target_commit" ]; then
+                current_desc=$(git -C "$sub" describe --tags "$current_commit" 2>/dev/null || echo "${current_commit:0:7}")
+                git -C "$sub" checkout "$latest_tag" --quiet
+                CHANGES+="- \`$name\`: \`$current_desc\` -> \`$latest_tag\`"$'\n'
+                UPDATED_COUNT=$((UPDATED_COUNT + 1))
+              fi
+            fi
+          done
+
+          if [ "$UPDATED_COUNT" -gt 0 ]; then
+            echo "has_updates=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "changes<<EOF"
+              echo "$CHANGES"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          else
+            echo "has_updates=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Pull Request
+        if: steps.update_submodules.outputs.has_updates == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(submodule): update submodules to latest release tags"
+          title: "chore(submodule): update submodules to latest release tags"
+          body: |
+            ## Automated Submodule Release Updates
+
+            Weekly automated check detected new release tags for the following submodules:
+
+            ${{ steps.update_submodules.outputs.changes }}
+
+            ---
+            *Triggered by GitHub Actions cron schedule (Weekly).*
+          branch: chore/submodule-release-updates
+          delete-branch: true
+          labels: |
+            dependencies
+            submodules
