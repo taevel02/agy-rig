@@ -88,21 +88,37 @@ clean_orphans() {
 }
 
 # 2. Global Instructions (AGENTS.md)
-echo -e "${BOLD}Global Agent Instructions${NC}"
+echo -e "${BOLD}Global Agent Instructions (~/.codex/AGENTS.md)${NC}"
 if [ -f "${SCRIPT_DIR}/config/AGENTS.md" ]; then
     make_symlink "${SCRIPT_DIR}/config/AGENTS.md" "${CODEX_HOME}/AGENTS.md"
-    make_symlink "${SCRIPT_DIR}/config/AGENTS.md" "${CODEX_HOME}/instructions.md"
+fi
+
+# Cleanup redundant instructions.md if present
+if [ -e "${CODEX_HOME}/instructions.md" ] || [ -L "${CODEX_HOME}/instructions.md" ]; then
+    if [ "$DRY_RUN" = true ]; then
+        echo -e "  ${YELLOW}[CLEAN DRY-RUN]${NC} Redundant instructions: ${CODEX_HOME}/instructions.md"
+    else
+        rm -rf "${CODEX_HOME}/instructions.md"
+        echo -e "  ${RED}✗${NC} Removed redundant: ${CODEX_HOME}/instructions.md"
+    fi
 fi
 echo ""
 
-# 3. Clean up orphaned symlinks
-echo -e "${BOLD}Checking Orphaned Symlinks${NC}"
+# 3. Clean up legacy/redundant ~/.codex/skills & orphaned symlinks
+echo -e "${BOLD}Cleaning Legacy & Orphaned Paths${NC}"
+if [ -d "${CODEX_HOME}/skills" ] || [ -L "${CODEX_HOME}/skills" ]; then
+    if [ "$DRY_RUN" = true ]; then
+        echo -e "  ${YELLOW}[CLEAN DRY-RUN]${NC} Redundant skills dir: ${CODEX_HOME}/skills"
+    else
+        rm -rf "${CODEX_HOME}/skills"
+        echo -e "  ${RED}✗${NC} Removed redundant: ${CODEX_HOME}/skills"
+    fi
+fi
 clean_orphans "${AGENTS_HOME}/skills"
-clean_orphans "${CODEX_HOME}/skills"
 echo ""
 
-# 4. Discover and Install Skills
-echo -e "${BOLD}Installing Skills (~/.agents/skills & ~/.codex/skills)${NC}"
+# 4. Discover and Install Skills (~/.agents/skills)
+echo -e "${BOLD}Installing Skills (~/.agents/skills)${NC}"
 SKILL_DIRS=("${SCRIPT_DIR}/skills")
 if [ -d "${SCRIPT_DIR}/plugins" ]; then
     for plugin_skills in "${SCRIPT_DIR}/plugins/"*/skills; do
@@ -118,7 +134,6 @@ for skill_dir in "${SKILL_DIRS[@]}"; do
             if [ -d "${skill_path}" ]; then
                 skill_name="$(basename "${skill_path}")"
                 make_symlink "${skill_path}" "${AGENTS_HOME}/skills/${skill_name}"
-                make_symlink "${skill_path}" "${CODEX_HOME}/skills/${skill_name}"
             fi
         done
     fi

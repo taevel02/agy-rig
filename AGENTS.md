@@ -14,7 +14,7 @@ Modular configuration repository tailored specifically for Codex CLI. It provisi
 
 ### 2. Custom Skills & Instructions
 - **Skills**: Local core skills in `skills/` (`caveman`, `simplify`, `using-atomic-commit`, `using-superpowers`). Upstream engineering skills in `plugins/waza` (`think`, `hunt`, `check`, `ui`, `read`, `learn`, `health`, `write`).
-- **Global Instructions**: `config/AGENTS.md` deployed to `~/.codex/AGENTS.md` and `~/.codex/instructions.md`.
+- **Global Instructions**: `config/AGENTS.md` deployed to `~/.codex/AGENTS.md`.
 - **Verification**: Validate shell scripts using `bash -n <script.sh>` after editing.
 
 ### 3. Commit Protocol
