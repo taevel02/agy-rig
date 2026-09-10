@@ -1,26 +1,20 @@
-# AGY Rig
+# Codex Rig
 
-**AGY Rig** is an automated, modular configuration repository for Google Antigravity (AGY) CLI. It provides custom session lifecycle hooks, token-saving terse response modes, Korean UX enforcement, MCP server integrations, and upstream engineering & marketing skills.
+**Codex Rig** is an automated, modular, and minimalist configuration repository tailored specifically for the **Codex CLI** environment. It provisions global agent instructions, Korean UX enforcement, token-saving terse response modes (caveman), git atomic commit protocols, and a focused suite of engineering skills (Waza + local core).
 
 ---
 
 ## Features
 
-- **Automated Symlink Setup (`install.sh`)**: One-command installation linking core configs, rules, hooks, and individual skills to `~/.gemini/config/` with `--dry-run` preview support.
-- **Smart Session Lifecycle Hooks (`hooks/session-start.sh`)**:
-  - **Antigravity CLI Lifecycle Hook Compliance**: Built on the standard `PreInvocation` event contract using `ephemeralMessage` step injection.
-  - **Dynamic Context Injection**: Injects full skill embeddings on `invocationNum == 1` and concise reminders on subsequent steps.
-  - **Caveman Full Mode**: Default terse, token-efficient communication.
-  - **Korean UX Enforcement**: Mandatory Korean responses for AI output while preserving technical symbols, code, and raw logs in English.
-  - **Atomic Commit Enforcement**: Automatic loading of `using-atomic-commit` skill for fast 1-line Conventional Commits v1.0.0.
-  - **Git Worktree & Submodule Awareness**: Maintains clean worktrees and handles submodules safely.
-- **Upstream Plugin Integrations**: Git Submodules tracking upstream skill repositories with individual skill symlinking and automatic `git pull` updates on install:
-  - `tw93/Waza` (`plugins/waza`)
-  - `coreyhaines31/marketingskills` (`plugins/marketingskills`)
-- **Configured MCP Servers**:
-  - `chrome-devtools`: `chrome-devtools-mcp`
-  - `context7`: `ctx7`
-  - `playwright`: `@playwright/mcp@latest`
+- **Automated Symlink Setup (`install.sh`)**: One-command installation linking global instructions and engineering skills directly to `~/.codex/` and `~/.agents/skills/` with `--dry-run` preview support and orphaned symlink cleanup.
+- **Global Instructions (`~/.codex/AGENTS.md`)**:
+  - **Korean UX Enforcement**: Mandatory Korean responses for all user-facing explanations, plans, and reviews, while preserving technical symbols, code blocks, and logs in English.
+  - **Using-Superpowers Mandate**: Anti-rationalization gate enforcing proactive skill execution (`/think`, `/hunt`, `/check`, etc.) before code is written.
+  - **Caveman Mode**: Terse, high-density, token-saving communication without conversational fluff.
+  - **Atomic Commit Protocol**: Standardized 1-line Conventional Commits upon completing verified units of work.
+- **Core Engineering Skills Suite**:
+  - Upstream `tw93/Waza` (`plugins/waza`): The gold-standard software engineering workflow skills.
+  - Local core skills: `using-superpowers`, `caveman`, `simplify`, `using-atomic-commit`.
 
 ---
 
@@ -33,7 +27,7 @@ Inspect what symlinks and plugin updates will be executed without modifying the 
 ```
 
 ### Apply Configuration
-Apply symlinks to `~/.gemini/config/`:
+Apply symlinks to `~/.codex/` and `~/.agents/skills/`:
 ```bash
 ./install.sh
 ```
@@ -42,34 +36,28 @@ Apply symlinks to `~/.gemini/config/`:
 
 ## Available Skills
 
-| Category | Skill / Plugin | Purpose |
+| Category | Skill | Purpose |
 | :--- | :--- | :--- |
-| **Waza Upstream** | `/think` | Pre-build planning, architecture design & decision validation |
-| | `/check` | Code review, diff inspection, release gates & project audit |
+| **Waza Suite** | `/think` | Pre-build planning, architecture design & decision validation |
 | | `/hunt` | Root cause diagnosis, bug fix & regression investigation |
+| | `/check` | Code review, diff inspection, release gates & project audit |
 | | `/ui` | UI/UX design, visual polish & component styling |
 | | `/write` | Technical documentation, release notes & copywriting |
 | | `/learn` | Deep research, synthesizing material & compiling sources |
 | | `/read` | Extracting web URLs & reading PDF documents |
 | | `/health` | Engineering health audit & config drift check |
-| **Marketing Skills** | MarketingSkills (50+) | Comprehensive growth & marketing skills (copywriting, seo-audit, launch, ads, cro, pricing, etc.) |
-| **Local / Built-in Skills** | `/caveman` | Switch communication intensity (`lite`, `full`, `ultra`) |
-| | `/simplify` | Refactor code for clarity without altering behavior |
-| | `/using-superpowers` | Meta-skill enforcing skill invocation before action |
+| **Core Drivers** | `/using-superpowers` | Meta-skill enforcing proactive skill invocation before action |
+| | `/caveman` | Terse communication intensity mode (`lite`, `full`, `ultra`) |
+| | `/simplify` | Refactor code for clarity and maintainability without altering behavior |
 | | `/using-atomic-commit` | Enforces 1-line atomic commits conforming to Conventional Commits v1.0.0 |
-| | `/writing-for-agents` | Guidelines for writing agent-consumable documents & skills |
-| | `/apple-design` | Apple's fluid interface design & motion principles for web |
 
 ---
 
 ## References & Acknowledgements
 
-- **[tw93/Waza](https://github.com/tw93/Waza)**: Upstream repository for core engineering workflow skills (`/think`, `/check`, `/hunt`, `/ui`, `/write`, `/learn`, `/read`, `/health`).
-- **[coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills)**: Upstream repository for growth and marketing skills.
+- **[tw93/Waza](https://github.com/tw93/Waza)**: Upstream repository for core engineering workflow skills.
 - **[obra/superpowers](https://github.com/obra/superpowers)**: Source reference for `/using-superpowers`.
 - **[juliusbrussee/caveman](https://github.com/juliusbrussee/caveman)**: Source reference for `/caveman`.
-- **[mattpocock/skills](https://github.com/mattpocock/skills)**: Source reference for `/writing-for-agents`.
-- **[emilkowalski/skills](https://github.com/emilkowalski/skills)**: Source reference for `/apple-design`.
 
 ---
 

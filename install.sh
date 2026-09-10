@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Antigravity Personal Environment Setup Script
+# Codex Environment Setup Script
 
 set -euo pipefail
 
@@ -9,6 +9,7 @@ CYAN='\033[0;36m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+RED='\033[0;31m'
 DIM='\033[2m'
 BOLD='\033[1m'
 NC='\033[0m'
@@ -24,25 +25,16 @@ for arg in "$@"; do
 done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TARGET_DIR="${HOME}/.gemini/config"
+CODEX_HOME="${HOME}/.codex"
+AGENTS_HOME="${HOME}/.agents"
 
 if [ "$DRY_RUN" = true ]; then
-    echo -e "${YELLOW}[DRY-RUN] Previewing Antigravity environment setup...${NC}\n"
+    echo -e "${YELLOW}[DRY-RUN] Previewing Codex environment setup...${NC}\n"
 else
-    echo -e "${CYAN}[SETUP] Installing Antigravity environment...${NC}\n"
+    echo -e "${CYAN}[SETUP] Installing Codex environment...${NC}\n"
 fi
 
-# Environment File Check (.env)
-if [ ! -f "${SCRIPT_DIR}/.env" ] && [ -f "${SCRIPT_DIR}/.env.example" ]; then
-    if [ "$DRY_RUN" = true ]; then
-        echo -e "${DIM}[INFO] Would create .env from .env.example${NC}\n"
-    else
-        cp "${SCRIPT_DIR}/.env.example" "${SCRIPT_DIR}/.env"
-        echo -e "${BLUE}[CONFIG] Created .env template from .env.example${NC}\n"
-    fi
-fi
-
-# Auto-update plugin submodules
+# 1. Update Submodules
 if [ -d "${SCRIPT_DIR}/plugins" ]; then
     for plugin_dir in "${SCRIPT_DIR}/plugins/"*; do
         if [ -d "${plugin_dir}/.git" ]; then
@@ -79,20 +71,38 @@ make_symlink() {
     fi
 }
 
-# 1. Core Configurations
-echo -e "${BOLD}Core Configurations${NC}"
-make_symlink "${SCRIPT_DIR}/config/mcp_config.json" "${TARGET_DIR}/mcp_config.json"
-make_symlink "${SCRIPT_DIR}/config/hooks.json" "${TARGET_DIR}/hooks.json"
+clean_orphans() {
+    local dir="$1"
+    [ -d "$dir" ] || return 0
+
+    for link in "$dir"/*; do
+        if [ -L "$link" ] && [ ! -e "$link" ]; then
+            if [ "$DRY_RUN" = true ]; then
+                echo -e "  ${YELLOW}[CLEAN DRY-RUN]${NC} Orphaned link: ${link}"
+            else
+                rm -f "$link"
+                echo -e "  ${RED}✗${NC} Removed orphaned link: ${link}"
+            fi
+        fi
+    done
+}
+
+# 2. Global Instructions (AGENTS.md)
+echo -e "${BOLD}Global Agent Instructions${NC}"
+if [ -f "${SCRIPT_DIR}/config/AGENTS.md" ]; then
+    make_symlink "${SCRIPT_DIR}/config/AGENTS.md" "${CODEX_HOME}/AGENTS.md"
+    make_symlink "${SCRIPT_DIR}/config/AGENTS.md" "${CODEX_HOME}/instructions.md"
+fi
 echo ""
 
-# 2. Hooks & Rules
-echo -e "${BOLD}Hooks & Rules${NC}"
-make_symlink "${SCRIPT_DIR}/hooks/session-start.sh" "${TARGET_DIR}/hooks/session-start.sh"
-make_symlink "${SCRIPT_DIR}/rules/korean-ux.md" "${TARGET_DIR}/rules/korean-ux.md"
+# 3. Clean up orphaned symlinks
+echo -e "${BOLD}Checking Orphaned Symlinks${NC}"
+clean_orphans "${AGENTS_HOME}/skills"
+clean_orphans "${CODEX_HOME}/skills"
 echo ""
 
-# 3. Skills (Local & Plugin Upstreams)
-echo -e "${BOLD}Skills${NC}"
+# 4. Discover and Install Skills
+echo -e "${BOLD}Installing Skills (~/.agents/skills & ~/.codex/skills)${NC}"
 SKILL_DIRS=("${SCRIPT_DIR}/skills")
 if [ -d "${SCRIPT_DIR}/plugins" ]; then
     for plugin_skills in "${SCRIPT_DIR}/plugins/"*/skills; do
@@ -106,16 +116,17 @@ for skill_dir in "${SKILL_DIRS[@]}"; do
     if [ -d "${skill_dir}" ]; then
         for skill_path in "${skill_dir}/"*; do
             if [ -d "${skill_path}" ]; then
-                make_symlink "${skill_path}" "${TARGET_DIR}/skills/$(basename "${skill_path}")"
+                skill_name="$(basename "${skill_path}")"
+                make_symlink "${skill_path}" "${AGENTS_HOME}/skills/${skill_name}"
+                make_symlink "${skill_path}" "${CODEX_HOME}/skills/${skill_name}"
             fi
         done
     fi
 done
 
-
 echo ""
 if [ "$DRY_RUN" = true ]; then
     echo -e "${GREEN}[OK] Dry-run preview complete.${NC}"
 else
-    echo -e "${GREEN}[OK] Antigravity environment setup complete.${NC}"
+    echo -e "${GREEN}[OK] Codex environment setup complete.${NC}"
 fi
