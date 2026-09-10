@@ -34,20 +34,15 @@ else
     echo -e "${CYAN}[SETUP] Installing Codex environment...${NC}\n"
 fi
 
-# 1. Update Submodules
-if [ -d "${SCRIPT_DIR}/plugins" ]; then
-    for plugin_dir in "${SCRIPT_DIR}/plugins/"*; do
-        if [ -d "${plugin_dir}/.git" ]; then
-            plugin_name="$(basename "${plugin_dir}")"
-            if [ "$DRY_RUN" = true ]; then
-                echo -e "${DIM}[INFO] Would update plugin ${plugin_name} via git pull${NC}\n"
-            else
-                echo -e "${BLUE}[UPDATE] Pulling ${plugin_name} updates...${NC}"
-                git -C "${plugin_dir}" pull --quiet || echo -e "${YELLOW}[WARN] Failed ${plugin_name} git pull${NC}"
-                echo ""
-            fi
-        fi
-    done
+# 1. Initialize and Update Submodules
+if [ -f "${SCRIPT_DIR}/.gitmodules" ]; then
+    if [ "$DRY_RUN" = true ]; then
+        echo -e "${DIM}[INFO] Would initialize & update submodules via git submodule update --init --recursive${NC}\n"
+    else
+        echo -e "${BLUE}[UPDATE] Updating submodules...${NC}"
+        git -C "${SCRIPT_DIR}" submodule update --init --recursive --quiet || echo -e "${YELLOW}[WARN] Failed submodule update${NC}"
+        echo ""
+    fi
 fi
 
 make_symlink() {
@@ -104,14 +99,14 @@ if [ -e "${CODEX_HOME}/instructions.md" ] || [ -L "${CODEX_HOME}/instructions.md
 fi
 echo ""
 
-# 3. Clean up legacy/redundant ~/.codex/skills & orphaned symlinks
-echo -e "${BOLD}Cleaning Legacy & Orphaned Paths${NC}"
-if [ -d "${CODEX_HOME}/skills" ] || [ -L "${CODEX_HOME}/skills" ]; then
+# 3. Clean up orphaned symlinks
+echo -e "${BOLD}Cleaning Orphaned Paths${NC}"
+if [ -d "${CODEX_HOME}/skills" ] && [ ! -L "${CODEX_HOME}/skills" ]; then
     if [ "$DRY_RUN" = true ]; then
-        echo -e "  ${YELLOW}[CLEAN DRY-RUN]${NC} Redundant skills dir: ${CODEX_HOME}/skills"
+        echo -e "  ${YELLOW}[CLEAN DRY-RUN]${NC} Legacy real directory: ${CODEX_HOME}/skills"
     else
         rm -rf "${CODEX_HOME}/skills"
-        echo -e "  ${RED}✗${NC} Removed redundant: ${CODEX_HOME}/skills"
+        echo -e "  ${RED}✗${NC} Removed legacy directory: ${CODEX_HOME}/skills"
     fi
 fi
 clean_orphans "${AGENTS_HOME}/skills"
@@ -119,6 +114,7 @@ echo ""
 
 # 4. Discover and Install Skills (~/.agents/skills)
 echo -e "${BOLD}Installing Skills (~/.agents/skills)${NC}"
+mkdir -p "${AGENTS_HOME}/skills"
 SKILL_DIRS=("${SCRIPT_DIR}/skills")
 if [ -d "${SCRIPT_DIR}/plugins" ]; then
     for plugin_skills in "${SCRIPT_DIR}/plugins/"*/skills; do
@@ -138,6 +134,14 @@ for skill_dir in "${SKILL_DIRS[@]}"; do
         done
     fi
 done
+
+# 5. Directory Link for Codex CLI Compatibility
+if [ "$DRY_RUN" = true ]; then
+    echo -e "\n  ${YELLOW}[DRY-RUN]${NC} Link ~/.codex/skills -> ~/.agents/skills"
+else
+    ln -sfn "${AGENTS_HOME}/skills" "${CODEX_HOME}/skills"
+    echo -e "\n  ${GREEN}✓${NC} ${BOLD}Codex Skills Link${NC}\n     ${DIM}-> ~/.codex/skills -> ~/.agents/skills${NC}"
+fi
 
 echo ""
 if [ "$DRY_RUN" = true ]; then
